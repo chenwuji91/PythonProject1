@@ -7,7 +7,7 @@ cellIdDict={}
 lukouDict={}
 roadAdjDict={}
 extraDis = 0
-outPath = '/Users/chenwuji/Documents/RoadMatch/staticPara/'
+outPath = '/Users/chenwuji/Documents/RoadMatch/staticPara1/'
 
 class RoadIntersectionPoint:
     def __init__(self,x,y):
