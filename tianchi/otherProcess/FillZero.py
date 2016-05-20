@@ -8,11 +8,11 @@
 import glob
 import os
 
-outputPath = '/Users/chenwuji/Documents/skypool/HotSongAndColdSong/songFilled/'
+outputPath = '/Users/chenwuji/Documents/skypool/集群原始数据/HotAndCold歌曲收听人数filled/'
 
 dateList = []
 def readRootPath():
-    f2 = glob.glob('/Users/chenwuji/Documents/skypool/HotSongAndColdSong/song/*')
+    f2 = glob.glob('/Users/chenwuji/Documents/skypool/集群原始数据/HotAndCold歌曲收听人数/*')
     for file2 in f2:
         readToBeFilled(file2)
 

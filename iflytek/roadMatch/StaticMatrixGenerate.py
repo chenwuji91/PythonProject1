@@ -42,6 +42,7 @@ class HouxuanPoint:
             self.voteDict.update({index1: current + 1})
         else:
             self.voteDict.setdefault(index1, 1)
+
 class HouXuanPath:#注意这个类和上一个类会保存
     def __init__(self, path, length, dis_similarity,time, time_similarity, point1 ,point2):
         self.path = path  #List类型  保存的是从下一个行驶的路口到下下个点的路口中间的完整的路径
@@ -180,8 +181,8 @@ def disSimilarity(point1,point2,distance,G, time_point, volicity): #传入的是
 
     def calSimilarity(shijiP ,HouxuanP ):
         value1 = 1 - abs(shijiP-HouxuanP)/shijiP
-        # print value1
         return max(0,value1)
+
     point11_21_length = nearestPathLen(point1.roadIntersection1,point2.roadIntersection1,G)
     point11_22_length = nearestPathLen(point1.roadIntersection1, point2.roadIntersection2, G)
     point12_21_length = nearestPathLen(point1.roadIntersection2, point2.roadIntersection1, G)
@@ -279,7 +280,6 @@ def roadMatch():
     #下面开始动态矩阵和投票系统  在动态矩阵部分处理剩下的内容   本程序重构之后只负责将当前路径的静态矩阵内容存储
     # for vetoCycle in len(trace):   #对每一轮进行一个投票
     #     vote(smallMatrix,trace,vetoCycle)   #开始对所有的点进行加权  trace是一个元组  smallMatrix表示图的边  保存的有HouXuanPath的相关信息
-    #
     # BestPath = generateBestPath(smallMatrix,trace)
     # print '最佳路径是'+ str(BestPath)
 

@@ -43,10 +43,10 @@ def process():
         eachline = eachline.split('\n')[0]
         list1 = eachline.split(',')
         song = list1[1]
-        if song in hotSong:
+        if song in coldSong:
             theSinger = songToSinger.get(song)
             writeToFile(outpath, list1[0]+','+theSinger+','+list1[2]+','+list1[3]+','+list1[4])
-        elif song in coldSong:
+        elif song in hotSong:
             writeToFile(outpath, eachline)
     f.close()
 

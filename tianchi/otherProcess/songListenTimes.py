@@ -11,11 +11,18 @@ import os
 songListTimes = {}
 songListPeople = {}
 #收听次数文件:
-listenTime = '/Users/chenwuji/Documents/skypool/HotSongAndColdSong/歌曲收听次数.csv'
+listenTime = '/Users/chenwuji/Documents/skypool/集群原始数据/歌曲收听次数.csv'
 #收听人数:
-listenPeople = '/Users/chenwuji/Documents/skypool/HotSongAndColdSong/歌曲收听人数.csv'
+listenPeople = '/Users/chenwuji/Documents/skypool/集群原始数据/歌曲收听人数.csv'
 #输出目录  该输出为文件夹输出
-outroot = '/Users/chenwuji/Documents/skypool/HotSongAndColdSong/高频歌曲人均收听次数/'
+outroot = '/Users/chenwuji/Documents/skypool/集群原始数据/HotAndCold歌曲平均次数/'
+
+# #收听次数文件:
+# listenTime = '/Users/chenwuji/Documents/skypool/集群原始数据/HotAndCold歌曲收听次数/'
+# #收听人数:
+# listenPeople = '/Users/chenwuji/Documents/skypool/集群原始数据/HotAndCold歌曲收听人数/'
+# #输出目录  该输出为文件夹输出
+# outroot = '/Users/chenwuji/Documents/skypool/集群原始数据/HotAndCold歌曲平均次数/'
 
 def readSongListenTimes():
     f = open(listenTime)
