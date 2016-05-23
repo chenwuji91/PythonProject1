@@ -126,7 +126,7 @@ def readLuce():
         f.close()
    # pass
 def readHouXuanPoint():
-    f = open('/Users/chenwuji/Documents/RoadMatch/HouXuanPointDis300MoreMeters.txt')
+    f = open('/Users/chenwuji/Documents/RoadMatch/HouxuanP.txt')
     for eachline in f:
         list1 = eachline.split(':')
         point0 = list1[0]

@@ -6,7 +6,7 @@
 
 
 def readcellIdSheet():
-    f = open('/Users/chenwuji/Documents/RoadMatch/cellNew.csv')
+    f = open('/Users/chenwuji/Documents/RoadMatch/Xiaoqu.csv')
     for eachline in f:
         list1 = eachline.split(',')
         try:
@@ -16,7 +16,7 @@ def readcellIdSheet():
             lati = list1[4]
             range = int(list1[10])
             data1 = nodeID + '\t' +longi + '\t' +lati + '\t' +str(range) + '\t'
-            writeToFile('/Users/chenwuji/Documents/RoadMatch/cellIdSheet.txt', data1)
+            writeToFile('/Users/chenwuji/Documents/RoadMatch/cellIdSheetOnlyXiaoQU.txt', data1)
         except:
             print eachline
 

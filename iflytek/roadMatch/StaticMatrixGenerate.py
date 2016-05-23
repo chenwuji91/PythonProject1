@@ -161,6 +161,7 @@ def graphGenerate():
     print "有向带权图加载完成"
     return G
 def nearestPath(point1,point2, G):
+
     return nx.dijkstra_path(G, point1 , point2)
 def nearestPathLen(point1,point2, G):
     return nx.dijkstra_path_length(G, point1, point2)
