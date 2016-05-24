@@ -6,8 +6,10 @@
 cellIdDict={}
 lukouDict={}
 roadAdjDict={}
+count = 0
 extraDis = 0
-outPath = '/Users/chenwuji/Documents/RoadMatch/staticPara1/'
+rootPath = '/Users/chenwuji/Documents/RoadMatch/'
+outPath = rootPath + 'staticPara1/'
 
 class RoadIntersectionPoint:
     def __init__(self,x,y):
@@ -15,7 +17,7 @@ class RoadIntersectionPoint:
         self.y = y
 
 def readLukou():
-        f =open('/Users/chenwuji/Documents/RoadMatch/lukou.txt')
+        f =open(rootPath+'RoadData/lukou.txt')
         for eachline in f:
             list1 = eachline.split()
             cellId = list1[0]
@@ -24,7 +26,7 @@ def readLukou():
         f.close()
 
 def readAdj():
-        f =open('/Users/chenwuji/Documents/RoadMatch/adj.txt')
+        f =open(rootPath+'RoadData/adj.txt')
         for eachline in f:
             list1 = eachline.split()
             roadAdjDict.setdefault(list1[0],list1[1:len(list1)])
@@ -91,13 +93,17 @@ def nearestPathLen(point1,point2, G):
         return 999999999
 
 def generateAllLukouDis():
+
+    global count
     resultDict = {}
     G = graphGenerate()
     for eachLukou1 in lukouDict:
         for eachLukou2 in lukouDict:
             length = nearestPathLen(eachLukou1,eachLukou2,G)
             path = nearestPath(eachLukou1, eachLukou2, G)
-            writeToFile(outPath + 'LukouDisStatic.txt',str(eachLukou1) + ';' + str(eachLukou2) + ";" + str(length) + ";" + str(path))
+            writeToFile(outPath + 'LukouDisStatic1.txt',str(eachLukou1) + ';' + str(eachLukou2) + ";" + str(length) + ";" + str(path))
+            count = count + 1
+            print count
             resultDict.setdefault((eachLukou1,eachLukou2),(length, path))
     objToFile('LukouDisStatic',resultDict)
 

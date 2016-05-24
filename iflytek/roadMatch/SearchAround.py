@@ -6,28 +6,28 @@
 cellIdDict={}
 lukouDict={}
 roadAdjDict={}
-extraDis = 0
+extraDis = 100
 
 class JiZhanPoint:
     def __init__(self,x,y,range):
 #         print 'NewObject'
         self.x = x
         self.y = y
-        self.range = range + extraDis
+        self.range = float(range) + float(extraDis)
 class RoadIntersectionPoint:
     def __init__(self,x,y):
 #         print 'NewObject'
         self.x = x
         self.y = y
 def readcellIdSheet():
-        f =open('/Users/chenwuji/Documents/RoadMatch/cellIdSheet.txt')
+        f =open('/Users/chenwuji/Documents/RoadMatch/RoadData/cellIdSheetOnlyXiaoQU.txt')
         for eachline in f:
             list1 = eachline.split('\t') 
             cellId = list1[0]          
             cellIdDict.setdefault(cellId,JiZhanPoint(float(list1[1]),float(list1[2]),float(list1[3])))
         f.close() 
 def readLukou():
-        f =open('/Users/chenwuji/Documents/RoadMatch/lukou.txt')
+        f =open('/Users/chenwuji/Documents/RoadMatch/RoadData/lukou.txt')
         for eachline in f:
             list1 = eachline.split()     
             cellId = list1[0]       
@@ -35,7 +35,7 @@ def readLukou():
             lukouDict.setdefault(cellId,RoadIntersectionPoint(float(position[0]),float(position[1])))
         f.close()
 def readAdj():
-        f =open('/Users/chenwuji/Documents/RoadMatch/adj.txt')
+        f =open('/Users/chenwuji/Documents/RoadMatch/RoadData/adj.txt')
         for eachline in f:
             list1 = eachline.split() 
 
@@ -50,7 +50,7 @@ def houxuanPoint(): #寻找附近的点  讲当前基站的路口点按照距离
             for roadIntersection in lukouDict:
                 currentLukouPoint = lukouDict.get(roadIntersection)#RoadIntersection是当前路口的ID号  得到的是当前ID对应的经纬度
                 currentDis = calculate(float(currentCellPoint.x),float(currentCellPoint.y),float(currentLukouPoint.x),float(currentLukouPoint.y)) #得到的是当前路口离当前基站的距离
-                if(currentDis<2000):#只找周围5KM的路口
+                if(currentDis<5000):#只找周围5KM的路口
                     #当前路口点和当前基站的距离加入字典集合
                     nearByPointSet.add(roadIntersection) #找到所有小于3km的点 放到集合里面去   15:40测试的没有问题
 
@@ -111,6 +111,7 @@ def generateHouxuanPoint(point,nearbyPointSet):   #原始基站点   基站点�
                 k1 = k1 + 0.000000001
             x_i =  (b0 - b1) / (k1 -k0)
             y_i = k0 * x_i + b0
+
             if x_i < min(x1,x2) or x_i > max(x1,x2):
                 disPoint01 = calculate(x0, y0, x1, y1)
                 disPoint02 = calculate(x0, y0, x2, y2)
@@ -119,12 +120,14 @@ def generateHouxuanPoint(point,nearbyPointSet):   #原始基站点   基站点�
                         return HouxuanPoint(x1, y1, roadPoint1, roadPoint2)
                     else:
                         return HouxuanPoint(x2, y2, roadPoint1, roadPoint2)
-                elif (disPoint01 < range0):
+                elif disPoint01 < range0:
                     return HouxuanPoint(x1, y1, roadPoint1, roadPoint2)
                 elif (disPoint02 < range0):
                     return HouxuanPoint(x2, y2, roadPoint1, roadPoint2)
-            else:
-                return HouxuanPoint(x_i, y_i, roadPoint1, roadPoint2)
+            elif x_i > min(x1,x2) or x_i < max(x1,x2):
+                dis = calculate(x_i, y_i, x0, y0)
+                if dis <= range0:
+                    return HouxuanPoint(x_i, y_i, roadPoint1, roadPoint2)
 
 
 
@@ -143,10 +146,6 @@ def generateHouxuanPoint(point,nearbyPointSet):   #原始基站点   基站点�
 
 from math import radians, cos, sin, asin, sqrt
 def calculate(lon1, lat1, lon2, lat2): # 经度1，纬度1，经度2，纬度2 （十进制度数）
-    """
-    Calculate the great circle distance between two points
-    on the earth (specified in decimal degrees)
-    """
     # 将十进制度数转化为弧度
     lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
     # haversine公式
@@ -158,7 +157,7 @@ def calculate(lon1, lat1, lon2, lat2): # 经度1，纬度1，经度2，纬度2 �
     return c * r * 1000
 
 def writeToFile(allHouxuanPoint):
-    f = file("/Users/chenwuji/Documents/RoadMatch/HouxuanP.txt", "a+")
+    f = file("/Users/chenwuji/Documents/RoadMatch/HouXuanPointInfo/HouxuanP"+str(extraDis)+".txt", "a+")
     for eachCellTable in allHouxuanPoint:
         li = eachCellTable + ":"
         f.writelines(li)

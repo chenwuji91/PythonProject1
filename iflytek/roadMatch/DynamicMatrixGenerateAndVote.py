@@ -8,7 +8,7 @@ import glob
 import os
 import pickle
 #传入两个点  计算时间和空间相似度
-pathdate = '20160826'
+pathdate = '20160330'
 voteMatrix = []
 cellIdDict={}
 lukouDict={}
@@ -34,19 +34,7 @@ class HouxuanPoint:
         self.roadIntersection2 = roadIntersection2
         self.voteCount = int(0)  # 获得的票数  票数是对象本身的属性
         self.voteDict = {}
-    # def increaseVote(self,index1):
-    #     self.voteCount = self.voteCount + 1
-    def getVote(self,index1):
-        return self.voteDict.get(index1)
-    def increaseVote(self,index1):#这个在增加的时候需要增加索引 这个设定是为了防止一条序列里面可能出现相同的两个序列 造成值引用的异常
-        if (self.voteDict.__contains__(index1)):
-            current = self.voteDict.get(index1)
-            self.voteDict.update({index1: current + 1})
-            pass
-        else:
-            self.voteDict.setdefault(index1, 1)
-    def printVote(self,k):
-        print self.voteDict.get(k)
+
 class HouXuanPath:#注意这个类和上一个类会保存
     def __init__(self, path, length, dis_similarity,time, time_similarity, point1 ,point2):
         self.path = path  #List类型  保存的是从下一个行驶的路口到下下个点的路口中间的完整的路径
@@ -58,11 +46,7 @@ class HouXuanPath:#注意这个类和上一个类会保存
         self.point1 = point1  #父节点1  1默认为主节点
         self.point2 = point2    #父节点2
         self.dSimilarity = self.similarity
-    def vote(self,matrixCount):
-        self.point1.increaseVote(matrixCount)
-    def voteTwo(self,matrixCount):
 
-        self.point2.increaseVote(matrixCount)  #当是矩阵中最后一个节点的时候 需要调用这个方法增加票数
 
     def setDSimilarity(self,sim):
         self.dSimilarity = sim * 10000  #人为的放大一个倍数
@@ -83,7 +67,7 @@ def readcellIdSheet():
             cellIdDict.setdefault(cellId,JiZhanPoint(float(list1[1]),float(list1[2]),float(list1[3])))
         f.close()
 def readLukou():
-        f =open('/Users/chenwuji/Documents/RoadMatch/lukou.txt')
+        f =open('/Users/chenwuji/Documents/RoadMatch/RoadData/lukou.txt')
         for eachline in f:
             list1 = eachline.split()
             cellId = list1[0]
@@ -91,7 +75,7 @@ def readLukou():
             lukouDict.setdefault(cellId,RoadIntersectionPoint(float(position[0]),float(position[1])))
         f.close()
 def readAdj():
-        f =open('/Users/chenwuji/Documents/RoadMatch/adj.txt')
+        f =open('/Users/chenwuji/Documents/RoadMatch/RoadData/adj.txt')
         for eachline in f:
             list1 = eachline.split()
             roadAdjDict.setdefault(list1[0],list1[1:len(list1)])
@@ -126,7 +110,7 @@ def readLuce():
         f.close()
    # pass
 def readHouXuanPoint():
-    f = open('/Users/chenwuji/Documents/RoadMatch/HouxuanP.txt')
+    f = open('/Users/chenwuji/Documents/RoadMatch/HouXuanPointInfo/HouXuanP100.txt')
     for eachline in f:
         list1 = eachline.split(':')
         point0 = list1[0]
@@ -153,9 +137,15 @@ def calculate(lon1, lat1, lon2, lat2): # 经度1，纬度1，经度2，纬度2 �
 import networkx as nx
 
 def nearestPath(point1,point2, G):
-    return nx.dijkstra_path(G, point1 , point2)
+    try:
+        return nx.dijkstra_path(G, point1 , point2)
+    except:
+        return [point1,point1]
 def nearestPathLen(point1,point2, G):
-    return nx.dijkstra_path_length(G, point1, point2)
+    try:
+        return nx.dijkstra_path_length(G, point1, point2)
+    except:
+        return 9
 
 
 #这个函数是整个程序的最后一个步骤  统计当前轨迹所有的票数 恢复出用户实际经过的所有的点   输入参数 smallMatrix的点   输出参数 轨迹[]  初期考虑输出的就是List的集合的叠加  表示出来一条完整的轨迹
@@ -183,9 +173,13 @@ def gengerateBestPathWithMatrix(smallMatrix,trace):
     bestList = []
     for m in range(len(trace)):
         currentList = voteMatrix[m]
+        # try:
         maxValue = max(currentList)
         bestIndex = currentList.index(maxValue)
         bestList.append(bestIndex)
+        # except:
+        #     print 'Empty Set'
+        #     pass
     # print bestList
     bestpath = []
     s = ''
@@ -269,26 +263,6 @@ def vote(smallMatrix , trace , k):  #k表示是第k轮投票  每一轮投票都
                 if traceLen[s]== 0.0:
                     traceLen[s] = traceLen[s] + 0.000001
                 smallMatrix[s][i][j].setDSimilarity(smallMatrix[s][i][j].similarity/traceLen[s])
-                # print str(s)+' '+str(i)+' '+str(j)+' '+ str(smallMatrix[s][i][j].dSimilarity)
-    #完成动态矩阵的加权  开始投票的环节
-    #对于投票而言,实际上是一个图  从上到下的一个有向图 在这个有向图里面找到一个最优的路径 从顶端到底端的有向图
-
-
-    #现在开始对节点进行生成和编号   最优投票路径上面的点
-    # votePoint = []
-    # for m in range(len(trace)-1):#  m=trace的时候是单独处理
-    #     pointEachLine = []
-    #     for n in range(len(smallMatrix[m])):
-    #         pointEachLine.append((m,n))  #点的组成为元组
-    #     votePoint.append(pointEachLine)
-    # print 'trace'
-    # print trace
-    # pointEachLine = []
-    # for n in range (len(houxuanPointDict.get(trace[len(trace)][0]))):  #最后一行的元素的数量  即最后一列候选点的个数
-    #     pointEachLine.append((len(trace),n))
-    # votePoint.append(pointEachLine)
-    # #现在votePoint存储的是所有节点的编号
-
     votePoint = []
     for m in range(len(trace)):
         pointEachLine = []
@@ -298,9 +272,6 @@ def vote(smallMatrix , trace , k):  #k表示是第k轮投票  每一轮投票都
     for m in range(len(votePoint)):
         for n in range(len(votePoint[m])):
             print votePoint[m][n]
-
-
-
     #后面开始建立
     G = nx.DiGraph()
     #开始建立 从当前层数k向上建立 并且同时从层数k向下进行建立
@@ -309,7 +280,7 @@ def vote(smallMatrix , trace , k):  #k表示是第k轮投票  每一轮投票都
         layer2 = votePoint[i+1]
         for l1 in layer1:
             for l2 in layer2:
-                G.add_edge(l1,l2,weight = (1.0/(smallMatrix[l1[0]][l1[1]][l2[1]].dSimilarity+0.0000001)))     #前面的加上后面的后缀
+                G.add_edge(l1,l2,weight = (1.0/(smallMatrix[l1[0]][l1[1]][l2[1]].dSimilarity+0.0000001)))     #前面的加上后面的后缀1.0/
     #向下的边全部添加完成  开始添加向上的边
     for i in range(0,k):  #从0到k-1的循环  实际形成的图是从k(包含)到0的所有的路径
         layer1 = votePoint[i]  #下面的节点
@@ -317,7 +288,7 @@ def vote(smallMatrix , trace , k):  #k表示是第k轮投票  每一轮投票都
         for l1 in layer1:
             for l2 in layer2:
                 # try:
-                    G.add_edge(l2,l1,weight = (1.0/(smallMatrix[l1[0]][l1[1]][l2[1]].dSimilarity+0.0000001))) #修复bug
+                    G.add_edge(l2,l1,weight = (1.0/(smallMatrix[l1[0]][l1[1]][l2[1]].dSimilarity+0.0000001))) #修复bug  1.0/
                 # except:
                 #     pass
 
@@ -340,7 +311,7 @@ def vote(smallMatrix , trace , k):  #k表示是第k轮投票  每一轮投票都
             smallMatrix = increaseVoteForEverySingleHouXuanPointOnEveryPath(bestVotePath2,k,smallMatrix,1)#对最佳路径上面的点进行投票
     # except:
     #     pass #IndexError: list index out of range
-    smallMatrix[0][1][1].point1.printVote(0)
+    # smallMatrix[0][1][1].point1.printVote(0)
     return smallMatrix
     pass
 
@@ -355,12 +326,9 @@ def increaseVoteForEverySingleHouXuanPointOnEveryPath(bestVotePath, k, smallMatr
         for i in range(0, len(bestVotePath)-2):#这里注意了 对于两个路径来说  处理的时候传入的参数还不一样 向上和向下的方向上面 在做smallMatrix下标的时候指向是不一样的
             everySinglePointInBestPath1 = bestVotePath[i]  #除去了最后的(99999,99999)的点
             everySinglePointInBestPath2 = bestVotePath[i+1]
-            smallMatrix[everySinglePointInBestPath1[0]][everySinglePointInBestPath1[1]][everySinglePointInBestPath2[1]].vote(k)
-            print '当前投票信息'+ str(everySinglePointInBestPath1[0])+' '+ str(everySinglePointInBestPath1[1])+' '+ str(everySinglePointInBestPath2[1])+' '
-            print '奇葩' + str(everySinglePointInBestPath1[0])+' '+str(everySinglePointInBestPath1[1])
+
             voteMatrix[everySinglePointInBestPath1[0]][everySinglePointInBestPath1[1]] = voteMatrix[everySinglePointInBestPath1[0]][everySinglePointInBestPath1[1]] + 1
             if i == (len(bestVotePath)-3):##Test#测试的时候最好检查一下k这个值到底投了几票
-                smallMatrix[everySinglePointInBestPath1[0]][everySinglePointInBestPath1[1]][everySinglePointInBestPath2[1]].voteTwo(k)
                 voteMatrix[everySinglePointInBestPath2[0]][everySinglePointInBestPath2[1]] = voteMatrix[everySinglePointInBestPath2[0]][everySinglePointInBestPath2[1]] + 1
     elif direction == 1:#向上
         for i in range(0, len(bestVotePath) - 2):  # 这里注意了 对于两个路径来说  处理的时候传入的参数还不一样 向上和向下的方向上面 在做smallMatrix下标的时候指向是不一样的
@@ -368,24 +336,16 @@ def increaseVoteForEverySingleHouXuanPointOnEveryPath(bestVotePath, k, smallMatr
             everySinglePointInBestPath1 = bestVotePath[i + 1]
             print '当前投票信息2' + str(everySinglePointInBestPath1[0]) + ' ' + str(
                 everySinglePointInBestPath1[1]) + ' ' + str(everySinglePointInBestPath2[1]) + ' '
-            smallMatrix[everySinglePointInBestPath1[0]][everySinglePointInBestPath1[1]][everySinglePointInBestPath2[1]].vote(k)
             voteMatrix[everySinglePointInBestPath1[0]][everySinglePointInBestPath1[1]] = voteMatrix[everySinglePointInBestPath1[0]][everySinglePointInBestPath1[1]] + 1
             # if i == (len(bestVotePath) - 2):   #这个投的票实际上是倒着进行的  所以实际上少的是k这个票点  实际这个在前面一个已经投票过了
-            #     smallMatrix[everySinglePointInBestPath1[0]][everySinglePointInBestPath1[1]][
-            #         everySinglePointInBestPath2[1]].voteTwo(k)
+
     else:
         pass
     return smallMatrix
 
 
 if __name__ == '__main__':
-     # a = (12,43)
-     # b = tupleTranslate(a)
-     # print b
-     # c = tupleRegenerate(b)
-     # print c
 
-     # 基本数据加载
      readLuce()
      readcellIdSheet()
      readLukou()
@@ -402,21 +362,7 @@ if __name__ == '__main__':
         smallMatrix = vote(smallMatrix,trace,vetoCycle)   #开始对所有的点进行加权  trace是一个元组  smallMatrix表示图的边  保存的有HouXuanPath的相关信息
      print '开始计算票数'
 
-     # for s in range(len(smallMatrix)):  # (len(trace)-1):
-     #     # 对于单独一个矩阵进行处理 先改变权值 再进行排序 找最优路径 计算票数
-     #     print '当前层数' + str(s)
-     #     for i in range(len(smallMatrix[s])):  # (len(Houxuan1List)):#smallMatrix[s]
-     #         for j in range(len(smallMatrix[s][i])):  # (len(Houxuan2List)):
-     #             print '当前候选点'+ str(s)+' '+ str(i)+' '+ str(j)+' '
-     #             smallMatrix[s][i][j].point1.printVote(s)
-     # BestPath = generateBestPath(smallMatrix,trace)
      gengerateBestPathWithMatrix(smallMatrix,trace)
-     # print '最佳路径是'+ str(BestPath)
-
-     # G = nx.DiGraph()
-     # G.add_edge('p1', 'p2', weight=2)
-     # G.add_edge('p2', 'p3', weight=2)
-     # print nearestPath('p3','p1',G)
 
 
 
