@@ -80,6 +80,13 @@ def readAdj():
             list1 = eachline.split()
             roadAdjDict.setdefault(list1[0],list1[1:len(list1)])
         f.close()
+
+def readLuceYuanshi():
+    dataFile = file('/Users/chenwuji/Documents/RoadMatch/MovingSeq/szf.data')
+    global luceDict
+    luceDict = pickle.load(dataFile)
+
+
 def readLuce():
     dir = '/Users/chenwuji/Documents/RoadMatch/szfOut04144WithDate/'  # 要访问文件夹路径
     f = glob.glob(dir + '//*')
@@ -109,14 +116,6 @@ def readLuce():
             luceDict.setdefault(date,listPoint)
         f.close()
    # pass
-
-import pickle
-def readLuceYuanshi():
-    dataFile = file('/Users/chenwuji/Documents/RoadMatch/MovingSeq/szf.data')
-    global luceDict
-    luceDict = pickle.load(dataFile)
-
-
 def readHouXuanPoint():
     f = open('/Users/chenwuji/Documents/RoadMatch/HouXuanPointInfo/HouXuanP100.txt')
     for eachline in f:
@@ -235,6 +234,18 @@ def traceDis(trace, k):
         print 'Error'
         sys.exit(-1)
 
+# def tupleTranslate(t):
+#     a = int(t[0])
+#     b = int(t[1])
+#     c = a * 1000000 + b
+#     return c
+# def tupleRegenerate(c):
+#     a = int(c/1000000)
+#     b = int(c%1000000)
+#     t = (a,b)
+#     return t
+
+#这个函数需要好好做测试
 
 def voteMatrixInit(trace):
 
@@ -243,9 +254,11 @@ def voteMatrixInit(trace):
         for n in range(len(houxuanPointDict.get(trace[m][0]))):
             pointEachLine.append(0)
         voteMatrix.append(pointEachLine)
+    # print len(voteMatrix)
+    # print len(voteMatrix[0])
+    # print 's'
 
-
-
+#未测试
 def vote(smallMatrix , trace , k):  #k表示是第k轮投票  每一轮投票都需要调用一次这个函数  其中k值表示确定的这个值是属于哪一层的  所以,在定义投票层数的时候需要定义全局的
     #但是在建立图的时候  是在完成加权之后  就需要建立一个图 并作为参数进行传递   smallMatrix实际上保存的是边的信息  注意:在循环的时候 是traceLength-1次的循环 最后一次要单独处理
     #注意::在处理完一个轨迹之后,需要对票数全部重新清0
@@ -281,8 +294,10 @@ def vote(smallMatrix , trace , k):  #k表示是第k轮投票  每一轮投票都
         layer2 = votePoint[i+1]   #上面面的节点  还是从1到2
         for l1 in layer1:
             for l2 in layer2:
+                # try:
                     G.add_edge(l2,l1,weight = (1.0/(smallMatrix[l1[0]][l1[1]][l2[1]].dSimilarity+0.0000001))) #修复bug  1.0/
-
+                # except:
+                #     pass
 
     #建立有向图的一个边界处理点  即第一层到起点的路径   和最后一层归一到终点的路径
     layerFirst = votePoint[0]
@@ -293,14 +308,17 @@ def vote(smallMatrix , trace , k):  #k表示是第k轮投票  每一轮投票都
         G.add_edge(l2,(999999,999999), weight = 1)  #最终到达999999点
 
     print '单个有向图建立完成'
+    #至此有向图建立完成  现在需要尝试在这一轮所有的点依次向上向下寻找最短路径
 
-
+    # try:
     for nthVote in range(len(smallMatrix[k])):#对k层的每一个节点依次开始进行投票
             bestVotePath1 = nearestPath((k, nthVote), (999999, 999999), G)
             bestVotePath2 = nearestPath((k, nthVote), (-1, -1), G)
             smallMatrix = increaseVoteForEverySingleHouXuanPointOnEveryPath(bestVotePath1,k,smallMatrix,0)#对最佳路径下面的点进行投票
             smallMatrix = increaseVoteForEverySingleHouXuanPointOnEveryPath(bestVotePath2,k,smallMatrix,1)#对最佳路径上面的点进行投票
-
+    # except:
+    #     pass #IndexError: list index out of range
+    # smallMatrix[0][1][1].point1.printVote(0)
     return smallMatrix
     pass
 
@@ -327,6 +345,7 @@ def increaseVoteForEverySingleHouXuanPointOnEveryPath(bestVotePath, k, smallMatr
                 everySinglePointInBestPath1[1]) + ' ' + str(everySinglePointInBestPath2[1]) + ' '
             voteMatrix[everySinglePointInBestPath1[0]][everySinglePointInBestPath1[1]] = voteMatrix[everySinglePointInBestPath1[0]][everySinglePointInBestPath1[1]] + 1
             # if i == (len(bestVotePath) - 2):   #这个投的票实际上是倒着进行的  所以实际上少的是k这个票点  实际这个在前面一个已经投票过了
+
     else:
         pass
     return smallMatrix
@@ -334,7 +353,6 @@ def increaseVoteForEverySingleHouXuanPointOnEveryPath(bestVotePath, k, smallMatr
 
 if __name__ == '__main__':
 
-     # readLuce()
      readLuceYuanshi()
      readcellIdSheet()
      readLukou()
@@ -343,7 +361,6 @@ if __name__ == '__main__':
          #下面开始动态矩阵和投票系统
      trace = luceDict.get(pathdate)
      readHouXuanPoint()  #加载候选点的数据
-
      rootpath = '/Users/chenwuji/Documents/RoadMatch/staticMatrix/'
      dataFile = file(rootpath+pathdate+'.data')
      smallMatrix = pickle.load(dataFile)

@@ -107,7 +107,7 @@ def readLuceYuanshi():
 
 
 def readHouXuanPoint():
-    f = open('/Users/chenwuji/Documents/RoadMatch/HouXuanPointInfo/HouXuanP100.txt')
+    f = open('/Users/chenwuji/Documents/RoadMatch/HouXuanPointInfo/HouXuanPP200.txt')
     for eachline in f:
         list1 = eachline.split(':')
         point0 = list1[0]
@@ -151,9 +151,10 @@ def graphGenerate():
 lukouCache = {}
 
 def readRoadIntersectionCache():
-    dataFile = file('/Users/chenwuji/Documents/RoadMatch/RoadData/szf.data')
+    dataFile1 = file('/Users/chenwuji/Documents/RoadMatch/LukouDisStatic.data','r')
     global lukouCache
-    luceDict = pickle.load(dataFile)
+    lukouCache = pickle.load(dataFile1)
+    print 'finish'
 
 def nearestPath(point1, point2, G):
     if luceDict.__contains__((point1,point2)):
@@ -338,6 +339,7 @@ if __name__ == '__main__':
      readLukou()
      readAdj()
      readHouXuanPoint()
+     readRoadIntersectionCache()
      pathdate = '20160330'
      roadMatch(pathdate)
 
