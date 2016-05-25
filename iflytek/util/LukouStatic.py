@@ -93,8 +93,6 @@ def nearestPathLen(point1,point2, G):
         return 999999999
 
 def generateAllLukouDis():
-
-    global count
     resultDict = {}
     G = graphGenerate()
     for eachLukou1 in lukouDict:
@@ -102,8 +100,6 @@ def generateAllLukouDis():
             length = nearestPathLen(eachLukou1,eachLukou2,G)
             path = nearestPath(eachLukou1, eachLukou2, G)
             writeToFile(outPath + 'LukouDisStatic1.txt',str(eachLukou1) + ';' + str(eachLukou2) + ";" + str(length) + ";" + str(path))
-            count = count + 1
-            print count
             resultDict.setdefault((eachLukou1,eachLukou2),(length, path))
     objToFile('LukouDisStatic',resultDict)
 

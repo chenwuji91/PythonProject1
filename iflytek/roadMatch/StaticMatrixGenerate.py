@@ -5,6 +5,7 @@
 
 import glob
 import os
+import pickle
 #传入两个点  计算时间和空间相似度
 
 cellIdDict={}
@@ -58,6 +59,7 @@ def readcellIdSheet():
             cellId = list1[0]
             cellIdDict.setdefault(cellId,JiZhanPoint(float(list1[1]),float(list1[2]),float(list1[3])))
         f.close()
+
 def readLukou():
         f =open('/Users/chenwuji/Documents/RoadMatch/RoadData/lukou.txt')
         for eachline in f:
@@ -66,12 +68,14 @@ def readLukou():
             position = list1[1].split(",")
             lukouDict.setdefault(cellId,RoadIntersectionPoint(float(position[0]),float(position[1])))
         f.close()
+
 def readAdj():
         f =open('/Users/chenwuji/Documents/RoadMatch/RoadData/adj.txt')
         for eachline in f:
             list1 = eachline.split()
             roadAdjDict.setdefault(list1[0],list1[1:len(list1)])
         f.close()
+
 def readLuce():
     dir = '/Users/chenwuji/Documents/RoadMatch/szfOut04144WithDate/'  # 要访问文件夹路径
     f = glob.glob(dir + '//*')
@@ -95,6 +99,12 @@ def readLuce():
                 # 在下面进行单个序列的最佳相似度的求解#
             luceDict.setdefault(date,listPoint)
         f.close()
+
+def readLuceYuanshi():
+    dataFile = file('/Users/chenwuji/Documents/RoadMatch/MovingSeq/szf.data')
+    global luceDict
+    luceDict = pickle.load(dataFile)
+
 
 def readHouXuanPoint():
     f = open('/Users/chenwuji/Documents/RoadMatch/HouXuanPointInfo/HouXuanP100.txt')
@@ -137,10 +147,37 @@ def graphGenerate():
             G.add_edge(eachPointPair,anotherPoint,weight = dis)
     print "有向带权图加载完成"
     return G
-def nearestPath(point1,point2, G):
+
+lukouCache = {}
+
+def readRoadIntersectionCache():
+    dataFile = file('/Users/chenwuji/Documents/RoadMatch/RoadData/szf.data')
+    global lukouCache
+    luceDict = pickle.load(dataFile)
+
+def nearestPath(point1, point2, G):
+    if luceDict.__contains__((point1,point2)):
+        return luceDict.get((point1, point2))[0]
+    elif luceDict.__contains__((point2, point1)):
+        return luceDict.get((point2, point1))[0]
+    else:
+        print "Call External Dijkstra"
+        return nearestPathWithDijkstra(point1, point2, G)
+
+def nearestPathLen(point1, point2, G):
+    if luceDict.__contains__((point1,point2)):
+        return luceDict.get((point1, point2))[1]
+    elif luceDict.__contains__((point2, point1)):
+        return luceDict.get((point2, point1))[1]
+    else:
+        print "Call External Dijkstra"
+        return nearestPathLenWithDijkstra(point1, point2, G)
+
+def nearestPathWithDijkstra(point1,point2, G):
     return nx.dijkstra_path(G, point1 , point2)
-def nearestPathLen(point1,point2, G):
+def nearestPathLenWithDijkstra(point1,point2, G):
     return nx.dijkstra_path_length(G, point1, point2)
+
 
 
 #传入的参数类型  point1 point2 类型为HouxuanPoint 类型 为 候选点  distance为真实点之间的距离  time_point为时间差  volicity为内置的速度值
@@ -159,7 +196,7 @@ def disSimilarity(point1,point2,distance,G, time_point, volicity): #传入的是
         return road_distance/volicity
 
     def calSimilarity(shijiP ,HouxuanP ):
-        value1 = 1 - abs(shijiP-HouxuanP)/shijiP
+        value1 = 1 - abs(shijiP-HouxuanP)/(shijiP+0.0000001)
         return max(0,value1)
 
     class NearestPathInfo:
@@ -296,7 +333,7 @@ def smallMatrixToFileWithPickle(filename, smallMatrix):
 
 if __name__ == '__main__':
      # 基本数据加载
-     readLuce()
+     readLuceYuanshi()
      readcellIdSheet()
      readLukou()
      readAdj()

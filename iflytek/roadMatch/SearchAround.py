@@ -6,7 +6,7 @@
 cellIdDict={}
 lukouDict={}
 roadAdjDict={}
-extraDis = 100
+extraDis = 200
 
 class JiZhanPoint:
     def __init__(self,x,y,range):
@@ -50,14 +50,13 @@ def houxuanPoint(): #寻找附近的点  讲当前基站的路口点按照距离
             for roadIntersection in lukouDict:
                 currentLukouPoint = lukouDict.get(roadIntersection)#RoadIntersection是当前路口的ID号  得到的是当前ID对应的经纬度
                 currentDis = calculate(float(currentCellPoint.x),float(currentCellPoint.y),float(currentLukouPoint.x),float(currentLukouPoint.y)) #得到的是当前路口离当前基站的距离
-                if(currentDis<5000):#只找周围5KM的路口
+                if(currentDis < 10000):#只找周围5KM的路口
                     #当前路口点和当前基站的距离加入字典集合
                     nearByPointSet.add(roadIntersection) #找到所有小于3km的点 放到集合里面去   15:40测试的没有问题
 
             HouxuanPoint = generateHouxuanPoint(eachCell,nearByPointSet)  #返回值需要为List类型  保存这里的每一个基站点对应的所有候选点集合
             allHouxuanPoint.setdefault(eachCell,HouxuanPoint)#将当前的点和当前点的候选点集加入到allHouxuanPoint字典里面去
             print '当前已处理节点数量'+str(allHouxuanPoint.__len__())
-
 
         print '候选点集合加载完毕'
         writeToFile(allHouxuanPoint)
@@ -157,7 +156,7 @@ def calculate(lon1, lat1, lon2, lat2): # 经度1，纬度1，经度2，纬度2 �
     return c * r * 1000
 
 def writeToFile(allHouxuanPoint):
-    f = file("/Users/chenwuji/Documents/RoadMatch/HouXuanPointInfo/HouxuanP"+str(extraDis)+".txt", "a+")
+    f = file("/Users/chenwuji/Documents/RoadMatch/HouXuanPointInfo/HouxuanPP"+str(extraDis)+".txt", "a+")
     for eachCellTable in allHouxuanPoint:
         li = eachCellTable + ":"
         f.writelines(li)
