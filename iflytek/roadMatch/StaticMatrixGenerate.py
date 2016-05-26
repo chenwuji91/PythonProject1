@@ -13,6 +13,8 @@ lukouDict={}
 roadAdjDict={}
 luceDict={}
 houxuanPointDict={}
+lukouCache = {}
+
 class JiZhanPoint:
     def __init__(self,x,y,range):
         self.x = x
@@ -43,7 +45,7 @@ class HouXuanPath:#注意这个类和上一个类会保存
         self.point2 = point2    #父节点2
         self.dSimilarity = self.similarity
     def setDSimilarity(self,sim):
-        self.dSimilarity = sim * 100  #人为的放大一个倍数
+        self.dSimilarity = sim * 10000  #人为的放大一个倍数
     def __cmp__(self, other):
         if self.dSimilarity > other.dSimilarity:
             return 1
@@ -148,7 +150,7 @@ def graphGenerate():
     print "有向带权图加载完成"
     return G
 
-lukouCache = {}
+
 
 def readRoadIntersectionCache():
     dataFile1 = file('/Users/chenwuji/Documents/RoadMatch/LukouDisStatic.data','r')
@@ -156,22 +158,35 @@ def readRoadIntersectionCache():
     lukouCache = pickle.load(dataFile1)
     print 'finish'
 
+def readRoadIntersectionCacheFromTxt():
+    f = open('/Users/chenwuji/Documents/RoadMatch/LukouDisStatic.txt')
+    for eachLine in f:
+        eachLine = eachLine.split('\n')[0]
+        list1 = eachLine.split(';')
+        road1 = list1[0]
+        road2 = list1[1]
+        dis = float(list1[2])
+        roadL = list1[3][2:len(list1[3])-2].split('\', \'')
+        lukouCache.setdefault((road1,road2),(dis,roadL))
+    print len(lukouCache)
+    pass
+
 def nearestPath(point1, point2, G):
-    if luceDict.__contains__((point1,point2)):
-        return luceDict.get((point1, point2))[0]
-    elif luceDict.__contains__((point2, point1)):
-        return luceDict.get((point2, point1))[0]
+    if lukouCache.__contains__((point1,point2)):
+        return lukouCache.get((point1, point2))[1]
+    elif lukouCache.__contains__((point2, point1)):
+        return lukouCache.get((point2, point1))[1]
     else:
-        print "Call External Dijkstra"
+        # print "Call External Dijkstra"
         return nearestPathWithDijkstra(point1, point2, G)
 
 def nearestPathLen(point1, point2, G):
-    if luceDict.__contains__((point1,point2)):
-        return luceDict.get((point1, point2))[1]
-    elif luceDict.__contains__((point2, point1)):
-        return luceDict.get((point2, point1))[1]
+    if lukouCache.__contains__((point1,point2)):
+        return lukouCache.get((point1, point2))[0]
+    elif lukouCache.__contains__((point2, point1)):
+        return lukouCache.get((point2, point1))[0]
     else:
-        print "Call External Dijkstra"
+        # print "Call External Dijkstra"
         return nearestPathLenWithDijkstra(point1, point2, G)
 
 def nearestPathWithDijkstra(point1,point2, G):
@@ -248,8 +263,8 @@ def disSimilarity(point1,point2,distance,G, time_point, volicity): #传入的是
                 self.nearestPathLen = self.point12_22_length
 
     nf = NearestPathInfo(point1, point2, G)
-    print nf.nearestPathLen
-    print nf.nearestPath
+    # print nf.nearestPathLen
+    # print nf.nearestPath
     len1 = nf.nearestPathLen
     time1 = timeSimilarity(volicity,len1)
     shortestPath = HouXuanPath(nf.nearestPath,len1 ,calSimilarity(distance,len1),time1,calSimilarity(time_point,time1),point1 ,point2)
@@ -266,7 +281,6 @@ def roadMatch(pathdate):
     G = graphGenerate()
     print trace   #开始处理一条轨迹
     smallMatrix = []  # 数组的最外层  即该维度表示的是是第几个小数组    索引为0到len(trace)-1的索引  表示的是两个实际点之间的小矩阵的复杂关系    最后这个smallMatrix保存饿的是这个整个序列的全局矩阵
-
     for pointPair in range(len(trace)-1):  #对于一个点而言
         Houxuan1List = houxuanPointDict.get(trace[pointPair][0])  #当前的点的所有候选点集  trace保存的是一个元组  [0]号下标表示基站点信息  [1]号下标表示时间戳
         Houxuan2List = houxuanPointDict.get(trace[pointPair+1][0])  #下一个点所有的候选点集
@@ -288,10 +302,10 @@ def roadMatch(pathdate):
             point1Matrix.append(point2Matrix)
         smallMatrix.append(point1Matrix)
 
-        print '中间的结果是'
-        for i in range(len(Houxuan1List)):
-            for j in range(len(Houxuan2List)):
-                print str(i)+"  "+ str(j)+"  "+str(point1Matrix[i][j].dSimilarity)
+        # print '中间的结果是'
+        # for i in range(len(Houxuan1List)):
+        #     for j in range(len(Houxuan2List)):
+        #         print str(i)+"  "+ str(j)+"  "+str(point1Matrix[i][j].dSimilarity)
     smallMatrixToFile(pathdate, smallMatrix)  # 保存矩阵的文件
     smallMatrixToFileWithPickle(pathdate, smallMatrix)  # 保存矩阵的文件
 
@@ -301,21 +315,21 @@ def roadMatch(pathdate):
 
 #这个函数是整个程序的最后一个步骤  统计当前轨迹所有的票数 恢复出用户实际经过的所有的点   输入参数 smallMatrix的点   输出参数 轨迹[]  初期考虑输出的就是List的集合的叠加  表示出来一条完整的轨迹
 def smallMatrixToFile(filename, smallMatrix):
-    rootpath = '/Users/chenwuji/Documents/RoadMatch/staticMatrix/'
+    rootpath = '/Users/chenwuji/Documents/RoadMatch/staticMatrixDealed/'
     f = file(rootpath + filename + '.txt', "a+")
     for s in range(len(smallMatrix)):  # (len(trace)-1):
         for i in range(len(smallMatrix[s])):  # (len(Houxuan1List)):#smallMatrix[s]
             for j in range(len(smallMatrix[s][i])):  # (len(Houxuan2List)):
-                print str(s) + ";" + str(i) + ";" + str(j) + ";" + str(smallMatrix[s][i][j].path) + ';' + \
-                      str(smallMatrix[s][i][j].length) + ';' + str(smallMatrix[s][i][j].dis_similarity) + ';' + str(
-                    smallMatrix[s][i][j].time_similarity) + ';' + \
-                      str(smallMatrix[s][i][j].time) + ';' + str(smallMatrix[s][i][j].similarity) + ';' + \
-                      str(str(smallMatrix[s][i][j].point1.x) + ',' + str(smallMatrix[s][i][j].point1.y) + ',' + str(
-                          smallMatrix[s][i][j].point1.roadIntersection1) + ',' + str(
-                          smallMatrix[s][i][j].point1.roadIntersection2)) + ';' + \
-                      str(str(smallMatrix[s][i][j].point2.x) + ',' + str(smallMatrix[s][i][j].point2.y) + ',' + str(
-                          smallMatrix[s][i][j].point2.roadIntersection1) + ',' + str(
-                          smallMatrix[s][i][j].point2.roadIntersection2)) + ';'
+                # print str(s) + ";" + str(i) + ";" + str(j) + ";" + str(smallMatrix[s][i][j].path) + ';' + \
+                #       str(smallMatrix[s][i][j].length) + ';' + str(smallMatrix[s][i][j].dis_similarity) + ';' + str(
+                #     smallMatrix[s][i][j].time_similarity) + ';' + \
+                #       str(smallMatrix[s][i][j].time) + ';' + str(smallMatrix[s][i][j].similarity) + ';' + \
+                #       str(str(smallMatrix[s][i][j].point1.x) + ',' + str(smallMatrix[s][i][j].point1.y) + ',' + str(
+                #           smallMatrix[s][i][j].point1.roadIntersection1) + ',' + str(
+                #           smallMatrix[s][i][j].point1.roadIntersection2)) + ';' + \
+                #       str(str(smallMatrix[s][i][j].point2.x) + ',' + str(smallMatrix[s][i][j].point2.y) + ',' + str(
+                #           smallMatrix[s][i][j].point2.roadIntersection1) + ',' + str(
+                #           smallMatrix[s][i][j].point2.roadIntersection2)) + ';'
                 f.writelines(str(s) + ";" + str(i) + ";" + str(j) + ";" + str(smallMatrix[s][i][j].path)+';'+ \
                       str(smallMatrix[s][i][j].length) +';' + str(smallMatrix[s][i][j].dis_similarity)+';'+ str(smallMatrix[s][i][j].time_similarity)+';'+ \
                       str(smallMatrix[s][i][j].time)+ ';' +str(smallMatrix[s][i][j].similarity)+ ';'+\
@@ -326,7 +340,7 @@ def smallMatrixToFile(filename, smallMatrix):
 
 import pickle as p
 def smallMatrixToFileWithPickle(filename, smallMatrix):
-    rootpath = '/Users/chenwuji/Documents/RoadMatch/staticMatrix/'
+    rootpath = '/Users/chenwuji/Documents/RoadMatch/staticMatrixDealed/'
     f = file(rootpath + filename + '.data', "w")
     p.dump(smallMatrix,f)
     f.close()
@@ -334,14 +348,20 @@ def smallMatrixToFileWithPickle(filename, smallMatrix):
 
 if __name__ == '__main__':
      # 基本数据加载
-     readLuceYuanshi()
+     readLuce()
+     # readLuceYuanshi()
      readcellIdSheet()
      readLukou()
      readAdj()
      readHouXuanPoint()
-     readRoadIntersectionCache()
-     pathdate = '20160330'
-     roadMatch(pathdate)
+     readRoadIntersectionCacheFromTxt()
+     for eachD in luceDict:
+        try:
+            roadMatch(eachD)
+        except:
+            print 'Fail',
+            print eachD
+
 
 
 
