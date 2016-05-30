@@ -15,6 +15,7 @@ lukouDict={}
 roadAdjDict={}
 luceDict={}
 houxuanPointDict={}
+rootDir = '/Users/chenwuji/Documents/RoadMatch/'
 class JiZhanPoint:
     def __init__(self,x,y,range):
 
@@ -57,14 +58,14 @@ class HouXuanPath:#注意这个类和上一个类会保存
             return 0
 
 def readcellIdSheet():
-        f =open('/Users/chenwuji/Documents/RoadMatch/cellIdSheet.txt')
+        f =open(rootDir+'cellIdSheet.txt')
         for eachline in f:
             list1 = eachline.split('\t')
             cellId = list1[0]
             cellIdDict.setdefault(cellId,JiZhanPoint(float(list1[1]),float(list1[2]),float(list1[3])))
         f.close()
 def readLukou():
-        f =open('/Users/chenwuji/Documents/RoadMatch/RoadData/lukou.txt')
+        f =open(rootDir+'RoadData/lukou.txt')
         for eachline in f:
             list1 = eachline.split()
             cellId = list1[0]
@@ -72,20 +73,19 @@ def readLukou():
             lukouDict.setdefault(cellId,RoadIntersectionPoint(float(position[0]),float(position[1])))
         f.close()
 def readAdj():
-        f =open('/Users/chenwuji/Documents/RoadMatch/RoadData/adj.txt')
+        f =open(rootDir+'RoadData/adj.txt')
         for eachline in f:
             list1 = eachline.split()
             roadAdjDict.setdefault(list1[0],list1[1:len(list1)])
         f.close()
 
 def readLuceYuanshi():
-    dataFile = file('/Users/chenwuji/Documents/RoadMatch/MovingSeq/szf.data')
+    dataFile = file(rootDir+'MovingSeq/szf.data')
     global luceDict
     luceDict = pickle.load(dataFile)
 
-
 def readLuce():
-    dir = '/Users/chenwuji/Documents/RoadMatch/szfOut04144WithDate/'  # 要访问文件夹路径
+    dir = rootDir+'szfOut04144WithDate/'  # 要访问文件夹路径
     f = glob.glob(dir + '//*')
     for file in f:
         filename = os.path.basename(file)
@@ -107,7 +107,7 @@ def readLuce():
         f.close()
 
 def readHouXuanPoint():
-    f = open('/Users/chenwuji/Documents/RoadMatch/HouXuanPointInfo/HouXuanPP200.txt')
+    f = open(rootDir+'HouXuanPointInfo/HouXuanPP200.txt')
     for eachline in f:
         list1 = eachline.split(':')
         point0 = list1[0]
@@ -140,7 +140,6 @@ def nearestPath(point1,point2, G):
 def nearestPathLen(point1,point2, G):
 
     return nx.dijkstra_path_length(G, point1, point2)
-
 
 def voteMatrixInit(trace):
     for m in range(len(trace)):
@@ -244,7 +243,17 @@ def vote(smallMatrix , trace , k):  #k表示是第k轮投票  每一轮投票都
             increaseVoteForEverySingleHouXuanPointOnEveryPath(bestVotePath2,1)#对最佳路径上面的点进行投票
 
 
+def timetranslate(HouxuanTime):
+    sss = int(HouxuanTime[len(HouxuanTime) - 2:len(HouxuanTime)])
+    mmm = int(HouxuanTime[len(HouxuanTime) - 4:len(HouxuanTime) - 2])
+    hhh = int(HouxuanTime[len(HouxuanTime) - 6:len(HouxuanTime) - 4])
+    return sss + mmm * 60 + hhh * 3600
 
+def writeToFile(fileName,data):
+    f = file(fileName, "a+")
+    f.writelines(data)
+    f.writelines('\n')
+    f.close()
 
 def gengerateBestPathWithMatrix(smallMatrix,trace):
     bestList = []
@@ -255,31 +264,26 @@ def gengerateBestPathWithMatrix(smallMatrix,trace):
         bestList.append(bestIndex)
 
     bestpath = []
-    s = ''
-    for i in range(len(bestList)-1):
-        bestpath.append(smallMatrix[i][bestList[i]][bestList[i+1]].path)
-    for eachP1 in bestpath:
-        for eachPP1 in eachP1:
-            # print eachPP1+',',
-            s = s + str(eachPP1) + ','
-    sProcessed = processAgain(s)
-    return '['+s+';'+sProcessed+']'
 
+    for i in range(len(trace)-1):
+        dis = (smallMatrix[i][bestList[i]][bestList[i + 1]].length)
+        timeHouxuan1 = timetranslate(trace[i][1])
+        timeHouxuan2 = timetranslate(trace[i + 1][1])
+        if(timeHouxuan2-timeHouxuan1==0):
+            timeHouxuan2 = timeHouxuan2 + 0.0000001
+        speed = dis/(timeHouxuan2-timeHouxuan1)
+        houxuanP1 = smallMatrix[i][bestList[i]][bestList[i + 1]].point1
+        houxuanP2 = smallMatrix[i][bestList[i]][bestList[i + 1]].point2
+        bestpath.append((trace[i][0], smallMatrix[i][bestList[i]][bestList[i+1]].path,dis,(timeHouxuan2 - timeHouxuan1),speed,houxuanP1,houxuanP2))
+    return bestpath
 
-
-def writeToFile(fileName,data):
-    f = file(fileName, "a+")
-    f.writelines(data)
-    f.writelines('\n')
-    f.close()
-
-
-def processAgain(StringToBeProcess):
-    sProcessed = ''
-    listall = str(StringToBeProcess).split(',')
-    listnew = []
-    for eachP in listall:
-        if listnew.__contains__(eachP):
+import pointToPointDis as pointCal
+def processAgain(ListToBeProcess):
+    pointCal.init()
+    listOnlyContainLukou = []
+    listContainsAll = []
+    for eachP in ListToBeProcess:
+        if listOnlyContainLukou.__contains__(eachP[0]):
             index1 = listnew.index(eachP)
             listnew = listnew[0:index1]
             listnew.append(eachP)
@@ -296,33 +300,36 @@ def processAgain(StringToBeProcess):
 
 if __name__ == '__main__':
 
-     readLuce()
+     readLuceYuanshi()
      readcellIdSheet()
      readLukou()
      readAdj()
 
 
-     fileList = glob.glob('/Users/chenwuji/Documents/RoadMatch/staticMatrixDealed/*.data')
+     fileList = glob.glob(rootDir+'staticMatrix/*.data')
      print fileList
      for eachF in fileList:
-         try:
+         # try:
              global voteMatrix
              voteMatrix = []
              filename = os.path.basename(eachF)
              pathdate = filename.split('.')[0]
              trace = luceDict.get(pathdate)
              readHouXuanPoint()  #加载候选点的数据
-             rootpath = '/Users/chenwuji/Documents/RoadMatch/staticMatrixDealed/'
+             rootpath = rootDir+'staticMatrix/'
              dataFile = file(rootpath+pathdate+'.data')
              smallMatrix = pickle.load(dataFile)
              voteMatrixInit(trace)
              for vetoCycle in range(len(trace)-1):#len(trace):   #对每一轮进行一个投票
                 vote(smallMatrix,trace,vetoCycle)   #开始对所有的点进行加权  trace是一个元组  smallMatrix表示图的边  保存的有HouXuanPath的相关信息
              print '开始计算票数'
-             resultString = gengerateBestPathWithMatrix(smallMatrix,trace)
-             writeToFile('/Users/chenwuji/Documents/RoadMatch/result/result_chuli_processed.txt',pathdate+':'+resultString)
-         except:
-             print 'FailDate' + eachF
+             resultListWithNoProcess = gengerateBestPathWithMatrix(smallMatrix,trace)
+             # sProcessed = processAgain(s)
+             for eachL in resultListWithNoProcess:
+                 writeToFile(rootDir+'result/notProcessed/'+ pathdate +'.txt',str(eachL[0])+';'+
+                             str(eachL[1]) + ';' +str(eachL[2])+';'+str(eachL[3])+';'+str(eachL[4]))
+         # except:
+         #     print 'FailDate' + eachF
 
 
 

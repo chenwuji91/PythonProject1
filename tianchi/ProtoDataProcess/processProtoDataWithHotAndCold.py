@@ -11,6 +11,7 @@ import os
 hotSong = []
 coldSong = []
 songToSinger = {}
+outpath = '/Users/chenwuji/Documents/skypool/user_actionHotCold.csv'
 
 
 
@@ -37,7 +38,7 @@ def readSingerSong():
     f.close()
 
 def process():
-    outpath = '/Users/chenwuji/Documents/skypool/user_actionHotCold.csv'
+
     f = open('/Users/chenwuji/Documents/skypool/mars_tianchi_user_actions.csv')
     for eachline in f:
         eachline = eachline.split('\n')[0]

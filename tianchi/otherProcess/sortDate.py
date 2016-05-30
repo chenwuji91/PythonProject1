@@ -11,12 +11,12 @@ from cwj.tianchi.otherProcess import songListenTimes as lstimes
 
 def readFile():
 
-    f2 = glob.glob('/Users/chenwuji/Documents/skypool/集群原始数据/HotAndCold歌曲平均次数/*')
+    f2 = glob.glob('/Users/chenwuji/Documents/skypool/集群原始数据/歌手平均次数/*')
     for file2 in f2:
         dict = {}
         filename2 = os.path.basename(file2)
         print '当前正在处理文件:' +  filename2
-        f3 = open('/Users/chenwuji/Documents/skypool/集群原始数据/HotAndCold歌曲平均次数/'+filename2)
+        f3 = open('/Users/chenwuji/Documents/skypool/集群原始数据/歌手平均次数/'+filename2)
         for eachline in f3:
             list1 = eachline.split('\n')[0].split(',')
             key1 = list1[1]
@@ -24,7 +24,7 @@ def readFile():
             dict.setdefault(key1,value1)
         dict1 = sorted(dict.iteritems(), key=lambda d: d[0])
         for eachdict in dict1:
-             lstimes.writeToFile('/Users/chenwuji/Documents/skypool/集群原始数据/HotAndCold歌曲平均次数Sorted/'+filename2,str(eachdict[1])+","+ str(eachdict[0]))
+             lstimes.writeToFile('/Users/chenwuji/Documents/skypool/集群原始数据/歌手平均次数Sorted/'+filename2,str(eachdict[1])+","+ str(eachdict[0]))
         f3.close()
 if __name__ == '__main__':
     readFile()

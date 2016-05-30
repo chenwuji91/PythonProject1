@@ -7,7 +7,7 @@ import glob
 import os
 import pickle
 #传入两个点  计算时间和空间相似度
-
+rootDir = '/Users/chenwuji/Documents/RoadMatch/'
 cellIdDict={}
 lukouDict={}
 roadAdjDict={}
@@ -31,8 +31,6 @@ class HouxuanPoint:
         self.roadIntersection1 = roadIntersection1
         self.roadIntersection2 = roadIntersection2
 
-
-
 class HouXuanPath:#注意这个类和上一个类会保存
     def __init__(self, path, length, dis_similarity,time, time_similarity, point1 ,point2):
         self.path = path  #List类型  保存的是从下一个行驶的路口到下下个点的路口中间的完整的路径
@@ -55,7 +53,7 @@ class HouXuanPath:#注意这个类和上一个类会保存
             return 0
 
 def readcellIdSheet():
-        f =open('/Users/chenwuji/Documents/RoadMatch/cellIdSheet.txt')
+        f =open(rootDir+'cellIdSheet.txt')
         for eachline in f:
             list1 = eachline.split('\t')
             cellId = list1[0]
@@ -63,7 +61,7 @@ def readcellIdSheet():
         f.close()
 
 def readLukou():
-        f =open('/Users/chenwuji/Documents/RoadMatch/RoadData/lukou.txt')
+        f =open(rootDir+'RoadData/lukou.txt')
         for eachline in f:
             list1 = eachline.split()
             cellId = list1[0]
@@ -72,14 +70,14 @@ def readLukou():
         f.close()
 
 def readAdj():
-        f =open('/Users/chenwuji/Documents/RoadMatch/RoadData/adj.txt')
+        f =open(rootDir+'RoadData/adj.txt')
         for eachline in f:
             list1 = eachline.split()
             roadAdjDict.setdefault(list1[0],list1[1:len(list1)])
         f.close()
 
 def readLuce():
-    dir = '/Users/chenwuji/Documents/RoadMatch/szfOut04144WithDate/'  # 要访问文件夹路径
+    dir = rootDir+'szfOut04144WithDate/'  # 要访问文件夹路径
     f = glob.glob(dir + '//*')
     for file in f:
         filename = os.path.basename(file)
@@ -103,13 +101,13 @@ def readLuce():
         f.close()
 
 def readLuceYuanshi():
-    dataFile = file('/Users/chenwuji/Documents/RoadMatch/MovingSeq/szf.data')
+    dataFile = file(rootDir+'MovingSeq/szf.data')
     global luceDict
     luceDict = pickle.load(dataFile)
 
 
 def readHouXuanPoint():
-    f = open('/Users/chenwuji/Documents/RoadMatch/HouXuanPointInfo/HouXuanPP200.txt')
+    f = open(rootDir+'HouXuanPointInfo/HouXuanPP200.txt')
     for eachline in f:
         list1 = eachline.split(':')
         point0 = list1[0]
@@ -153,13 +151,13 @@ def graphGenerate():
 
 
 def readRoadIntersectionCache():
-    dataFile1 = file('/Users/chenwuji/Documents/RoadMatch/LukouDisStatic.data','r')
+    dataFile1 = file(rootDir+'LukouDisStatic.data','r')
     global lukouCache
     lukouCache = pickle.load(dataFile1)
     print 'finish'
 
 def readRoadIntersectionCacheFromTxt():
-    f = open('/Users/chenwuji/Documents/RoadMatch/LukouDisStatic.txt')
+    f = open(rootDir+'LukouDisStatic.txt')
     for eachLine in f:
         eachLine = eachLine.split('\n')[0]
         list1 = eachLine.split(';')
@@ -315,7 +313,7 @@ def roadMatch(pathdate):
 
 #这个函数是整个程序的最后一个步骤  统计当前轨迹所有的票数 恢复出用户实际经过的所有的点   输入参数 smallMatrix的点   输出参数 轨迹[]  初期考虑输出的就是List的集合的叠加  表示出来一条完整的轨迹
 def smallMatrixToFile(filename, smallMatrix):
-    rootpath = '/Users/chenwuji/Documents/RoadMatch/staticMatrixDealed/'
+    rootpath = rootDir+'staticMatrixDealed/'
     f = file(rootpath + filename + '.txt', "a+")
     for s in range(len(smallMatrix)):  # (len(trace)-1):
         for i in range(len(smallMatrix[s])):  # (len(Houxuan1List)):#smallMatrix[s]
@@ -340,7 +338,7 @@ def smallMatrixToFile(filename, smallMatrix):
 
 import pickle as p
 def smallMatrixToFileWithPickle(filename, smallMatrix):
-    rootpath = '/Users/chenwuji/Documents/RoadMatch/staticMatrixDealed/'
+    rootpath = rootDir+'staticMatrixDealed/'
     f = file(rootpath + filename + '.data', "w")
     p.dump(smallMatrix,f)
     f.close()

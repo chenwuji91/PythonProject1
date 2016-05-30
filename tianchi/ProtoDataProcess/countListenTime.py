@@ -1,7 +1,7 @@
 #-*- coding: UTF-8 -*-
 '''
 @author: chenwuji
-读入原始数据 按照天来分类
+计算歌曲的收听次数
 '''
 
 dataIn = '/Users/chenwuji/Documents/skypool/集群原始数据/原始数据按天分文件/*'
