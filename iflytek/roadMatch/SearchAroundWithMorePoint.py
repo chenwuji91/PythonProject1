@@ -6,18 +6,17 @@
 cellIdDict={}
 lukouDict={}
 roadAdjDict={}
-extraDis = 500
+extraDis = 300
 rootDir = '/Users/chenwuji/Documents/RoadMatch/'
+eachRoadSplitLen = 50
 
 class JiZhanPoint:
     def __init__(self,x,y,range):
-#         print 'NewObject'
         self.x = x
         self.y = y
         self.range = float(range) + float(extraDis)
 class RoadIntersectionPoint:
     def __init__(self,x,y):
-#         print 'NewObject'
         self.x = x
         self.y = y
 def readcellIdSheet():
@@ -54,15 +53,14 @@ def houxuanPoint(): #寻找附近的点  讲当前基站的路口点按照距离
                 if(currentDis < 10000):#只找周围5KM的路口
                     #当前路口点和当前基站的距离加入字典集合
                     nearByPointSet.add(roadIntersection) #找到所有小于3km的点 放到集合里面去   15:40测试的没有问题
-
             HouxuanPoint = generateHouxuanPoint(eachCell,nearByPointSet)  #返回值需要为List类型  保存这里的每一个基站点对应的所有候选点集合
             allHouxuanPoint.setdefault(eachCell,HouxuanPoint)#将当前的点和当前点的候选点集加入到allHouxuanPoint字典里面去
             print '当前已处理节点数量'+str(allHouxuanPoint.__len__())
-
         print '候选点集合加载完毕'
         writeToFile(allHouxuanPoint)
 
 def generateHouxuanPoint(point,nearbyPointSet):   #原始基站点   基站点周围的临近路口点的集合     返回候选点段集  点集定义的是 经纬度 属于的道路(第一个编号 第二个编号)
+
         listHouxuan = []
         dictHouxuan = {}
         class HouxuanPoint:
@@ -72,8 +70,8 @@ def generateHouxuanPoint(point,nearbyPointSet):   #原始基站点   基站点�
                 self.roadIntersection1 = roadIntersection1
                 self.roadIntersection2 = roadIntersection2
 
-
-        def lineToPointDis(cellID, roadPoint1, roadPoint2):
+        def getHouxuanPoint(cellID, roadPoint1, roadPoint2):
+            houxuanListOfOneCell = []
             class RoadLine:
                 def __init__(self, x1, y1, x2, y2):
                     self.x1 = x1
@@ -84,60 +82,36 @@ def generateHouxuanPoint(point,nearbyPointSet):   #原始基站点   基站点�
                         x2 += 0.0000001
                     self.k = (y2 - y1) / (x2 - x1)
                     self.b = y1 - (self.k) * x1
-
-            class Chuixian:
-                def __init__(self, x0, y0, k):
-                    self.x0 = x0
-                    self.y0 = y0
-                    self.k = k
-                    self.b = y0 - (self.k) * x0
+            pointCell = cellIdDict.get(cellID)
+            range0 = pointCell.range
+            x0 = pointCell.x
+            y0 = pointCell.y
             point1 = lukouDict.get(roadPoint1)
             x1 = point1.x
             y1 = point1.y
             point2 = lukouDict.get(roadPoint2)
             x2 = point2.x
             y2 = point2.y
-            pointCell = cellIdDict.get(cellID)
-            x0 = pointCell.x
-            y0 = pointCell.y
-            range0 = pointCell.range
-            line12 = RoadLine(x1, y1, x2, y2)
-            k1 = line12.k
-            b1 = line12.b
-            chuixian = Chuixian(x0,y0,-1.0/k1)
-            k0 = chuixian.k
-            b0 = chuixian.b
-            if k1-k0==0:
-                k1 = k1 + 0.000000001
-            x_i =  (b0 - b1) / (k1 -k0)
-            y_i = k0 * x_i + b0
-
-            if x_i < min(x1,x2) or x_i > max(x1,x2):
-                disPoint01 = calculate(x0, y0, x1, y1)
-                disPoint02 = calculate(x0, y0, x2, y2)
-                if (disPoint01 < range0 and disPoint02 < range0):  # 在设置参数的时候,把距离的2倍作为候选点  可以搜索到更多的候选点,这个后期可以做改变
-                    if disPoint01 <= disPoint02:
-                        return HouxuanPoint(x1, y1, roadPoint1, roadPoint2)
-                    else:
-                        return HouxuanPoint(x2, y2, roadPoint1, roadPoint2)
-                elif disPoint01 < range0:
-                    return HouxuanPoint(x1, y1, roadPoint1, roadPoint2)
-                elif (disPoint02 < range0):
-                    return HouxuanPoint(x2, y2, roadPoint1, roadPoint2)
-            elif x_i > min(x1,x2) or x_i < max(x1,x2):
-                dis = calculate(x_i, y_i, x0, y0)
-                if dis <= range0:
-                    return HouxuanPoint(x_i, y_i, roadPoint1, roadPoint2)
+            roadLen = calculate(x1, y1, x2, y2)
+            splitPieceNo = max(int(roadLen/eachRoadSplitLen),1)
+            xInter = (max(x1,x2) - min(x1, x2))/splitPieceNo
+            yInter = (max(y1,y2) - min(y1, y2))/splitPieceNo
+            for i in range(splitPieceNo):
+                xH = min(x1, x2) + (i + 1) * xInter
+                yH = min(y1, y2) + (i + 1) * yInter
+                if calculate(x0,y0,xH,yH) < range0:
+                    houxuanListOfOneCell.append(HouxuanPoint(xH, yH, roadPoint1, roadPoint2))
+            return houxuanListOfOneCell
 
 
 
         for eachP1 in nearbyPointSet:
             listP2 = roadAdjDict.get(eachP1)
             for eachP2 in listP2:
-                singlePoint = lineToPointDis(point, eachP1, eachP2)
-                # print type(singlePoint)
-                if  isinstance(singlePoint,HouxuanPoint):
-                    dictHouxuan.setdefault((singlePoint.x,singlePoint.y),singlePoint)
+                HouxuanPointList = getHouxuanPoint(point, eachP1, eachP2)  #返回候选Point的集合
+                for singlePoint in HouxuanPointList:
+                    if isinstance(singlePoint, HouxuanPoint):
+                        dictHouxuan.setdefault((singlePoint.x, singlePoint.y), singlePoint)
         for e in dictHouxuan:
             listHouxuan.append(dictHouxuan.get(e))
         return listHouxuan
@@ -157,7 +131,7 @@ def calculate(lon1, lat1, lon2, lat2): # 经度1，纬度1，经度2，纬度2 �
     return c * r * 1000
 
 def writeToFile(allHouxuanPoint):
-    f = file(rootDir + "RoadMatch/HouXuanPointInfo/HouxuanPP"+str(extraDis)+".txt", "a+")
+    f = file(rootDir + "HouXuanPointInfo/HouxuanNew"+str(extraDis)+'-'+ str(eachRoadSplitLen) +".txt", "a+")
     for eachCellTable in allHouxuanPoint:
         li = eachCellTable + ":"
         f.writelines(li)
