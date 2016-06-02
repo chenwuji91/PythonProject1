@@ -6,8 +6,9 @@
 import glob
 import os
 import pickle
+import constant
 #传入两个点  计算时间和空间相似度
-rootDir = '/Users/chenwuji/Documents/RoadMatch/'
+rootDir = constant.rootPath
 cellIdDict={}
 lukouDict={}
 roadAdjDict={}
@@ -32,7 +33,6 @@ class HouxuanPoint:
         self.roadIntersection2 = roadIntersection2
     def setDisToJizhan(self, JizhanPoint):
         self.distanceToJizhan = calculate(self.x, self.y, JizhanPoint.x, JizhanPoint.y)
-
 class HouXuanPath:#注意这个类和上一个类会保存
     def __init__(self, path, length, dis_similarity,time, time_similarity, point1 ,point2):
         self.path = path  #List类型  保存的是从下一个行驶的路口到下下个点的路口中间的完整的路径
@@ -53,33 +53,29 @@ class HouXuanPath:#注意这个类和上一个类会保存
             return -1
         else:
             return 0
-
 def readcellIdSheet():
-        f =open(rootDir+'cellIdSheet.txt')
+        f =open(rootDir + constant.cellIDSheet)
         for eachline in f:
             list1 = eachline.split('\t')
             cellId = list1[0]
             cellIdDict.setdefault(cellId,JiZhanPoint(float(list1[1]),float(list1[2]),float(list1[3])))
         f.close()
-
 def readLukou():
-        f =open(rootDir+'RoadData/lukou.txt')
+        f =open(rootDir + constant.lukouInfo)
         for eachline in f:
             list1 = eachline.split()
             cellId = list1[0]
             position = list1[1].split(",")
             lukouDict.setdefault(cellId,RoadIntersectionPoint(float(position[0]),float(position[1])))
         f.close()
-
 def readAdj():
-        f =open(rootDir+'RoadData/adj.txt')
+        f =open(rootDir + constant.adjInfo)
         for eachline in f:
             list1 = eachline.split()
             roadAdjDict.setdefault(list1[0],list1[1:len(list1)])
         f.close()
-
 def readLuce():
-    dir = rootDir+'szfOut04144WithDate/'  # 要访问文件夹路径
+    dir = rootDir + constant.luceProcessed # 要访问文件夹路径
     f = glob.glob(dir + '//*')
     for file in f:
         filename = os.path.basename(file)
@@ -101,16 +97,13 @@ def readLuce():
                 # 在下面进行单个序列的最佳相似度的求解#
             luceDict.setdefault(date,listPoint)
         f.close()
-
-
 def readLuceYuanshi():
     # dataFile = file(rootDir+'MovingSeq/szf.data')
-    dataFile = file(rootDir+'zyc/result.data')
+    dataFile = file(rootDir+ constant.luceYuanshi)
     global luceDict
     luceDict = pickle.load(dataFile)
-
 def readHouXuanPoint():
-    f = open(rootDir+'HouXuanPointInfo/HouXuanPP200.txt')
+    f = open(rootDir + constant.houxuanPointPath)
     for eachline in f:
         list1 = eachline.split(':')
         point0 = list1[0]
@@ -123,7 +116,6 @@ def readHouXuanPoint():
                 list3.append(HouxuanPoint(float(list4[0]),float(list4[1]),list4[2],list4[3]))
         houxuanPointDict.setdefault(point0,list3)
     f.close()
-
 from math import radians, cos, sin, asin, sqrt
 def calculate(lon1, lat1, lon2, lat2): # 经度1，纬度1，经度2，纬度2 （十进制度数）
     lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
@@ -134,7 +126,6 @@ def calculate(lon1, lat1, lon2, lat2): # 经度1，纬度1，经度2，纬度2 �
     c = 2 * asin(sqrt(a))
     r = 6371 # 地球平均半径，单位为公里
     return c * r * 1000
-
 import networkx as nx
 def graphGenerate():
     G = nx.DiGraph()
@@ -150,17 +141,13 @@ def graphGenerate():
             G.add_edge(eachPointPair,anotherPoint,weight = dis)
     print "有向带权图加载完成"
     return G
-
-
-
-def readRoadIntersectionCache():
-    dataFile1 = file(rootDir+'LukouDisStatic.data','r')
-    global lukouCache
-    lukouCache = pickle.load(dataFile1)
-    print 'finish'
-
+# def readRoadIntersectionCache():
+#     dataFile1 = file(rootDir+'LukouDisStatic.data','r')
+#     global lukouCache
+#     lukouCache = pickle.load(dataFile1)
+#     print 'finish'
 def readRoadIntersectionCacheFromTxt():
-    f = open(rootDir+'LukouDisStatic.txt')
+    f = open(rootDir + constant.roadIntersectionDisCache)
     for eachLine in f:
         eachLine = eachLine.split('\n')[0]
         list1 = eachLine.split(';')
@@ -171,7 +158,6 @@ def readRoadIntersectionCacheFromTxt():
         lukouCache.setdefault((road1,road2),(dis,roadL))
     print len(lukouCache)
     pass
-
 def nearestPath(point1, point2, G):
     if lukouCache.__contains__((point1,point2)):
         return lukouCache.get((point1, point2))[1]
@@ -180,7 +166,6 @@ def nearestPath(point1, point2, G):
     else:
         # print "Call External Dijkstra"
         return nearestPathWithDijkstra(point1, point2, G)
-
 def nearestPathLen(point1, point2, G):
     if lukouCache.__contains__((point1,point2)):
         return lukouCache.get((point1, point2))[0]
@@ -189,13 +174,10 @@ def nearestPathLen(point1, point2, G):
     else:
         # print "Call External Dijkstra"
         return nearestPathLenWithDijkstra(point1, point2, G)
-
 def nearestPathWithDijkstra(point1,point2, G):
     return nx.dijkstra_path(G, point1 , point2)
 def nearestPathLenWithDijkstra(point1,point2, G):
     return nx.dijkstra_path_length(G, point1, point2)
-
-
 
 #传入的参数类型  point1 point2 类型为HouxuanPoint 类型 为 候选点  distance为真实点之间的距离  time_point为时间差  volicity为内置的速度值
 def disSimilarity(point1,point2,distance,G, time_point, volicity): #传入的是两个点的信息 以及两个实际点之间的距离 点的定义如上个HouxuanPoint类所示  返回的是距离的相似度的值(以及当前相似度下面的道路路径)  相似度的值计算需要两个点的直线距离 以及点在道路上面的最短距离
@@ -273,8 +255,6 @@ def disSimilarity(point1,point2,distance,G, time_point, volicity): #传入的是
 
     # (self, path, length, dis_similarity, time, time_similarity, point1, point2):
     return shortestPath  #返回的是一个类  包含节点中间最短路径 以及该候选路径的相似度
-
-
 def roadMatch(pathdate):
     def timetranslate(HouxuanTime):
         sss = int(HouxuanTime[len(HouxuanTime) - 2:len(HouxuanTime)])
@@ -316,13 +296,9 @@ def roadMatch(pathdate):
     smallMatrixToFile(pathdate, smallMatrix)  # 保存矩阵的文件
     smallMatrixToFileWithPickle(pathdate, smallMatrix)  # 保存矩阵的文件
 
-
-
-
-
 #这个函数是整个程序的最后一个步骤  统计当前轨迹所有的票数 恢复出用户实际经过的所有的点   输入参数 smallMatrix的点   输出参数 轨迹[]  初期考虑输出的就是List的集合的叠加  表示出来一条完整的轨迹
 def smallMatrixToFile(filename, smallMatrix):
-    rootpath = rootDir+'staticMatrixDealed/'
+    rootpath = rootDir+ constant.staticMatrixOutPath
     f = file(rootpath + filename + '.txt', "a+")
     for s in range(len(smallMatrix)):  # (len(trace)-1):
         for i in range(len(smallMatrix[s])):  # (len(Houxuan1List)):#smallMatrix[s]
@@ -344,14 +320,12 @@ def smallMatrixToFile(filename, smallMatrix):
                       str(str(smallMatrix[s][i][j].point2.x) + ',' + str(smallMatrix[s][i][j].point2.y) + ',' + str(smallMatrix[s][i][j].point2.roadIntersection1) + ',' + str(smallMatrix[s][i][j].point2.roadIntersection2)) + ';')
                 f.writelines("\n")
     f.close()
-
 import pickle as p
 def smallMatrixToFileWithPickle(filename, smallMatrix):
-    rootpath = rootDir+'staticMatrixDealed/'
+    rootpath = rootDir + constant.staticMatrixOutPath
     f = file(rootpath + filename + '.data', "w")
     p.dump(smallMatrix,f)
     f.close()
-
 
 if __name__ == '__main__':
      # 基本数据加载

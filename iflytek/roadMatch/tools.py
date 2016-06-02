@@ -26,3 +26,21 @@ def toFileWithPickle(filename, obj1):
     f = file(filename + '.data', "w")
     p.dump(obj1,f)
     f.close()
+
+
+def writeToFile(fileName,data):
+    f = file(fileName, "a+")
+    f.writelines(data)
+    f.close()
+
+def process(listall):
+    listnew = []
+    for eachP in listall:
+        if listnew.__contains__(eachP):
+            index1 = listnew.index(eachP)
+            listnew = listnew[0:index1]
+            listnew.append(eachP)
+            pass
+        else:
+            listnew.append(eachP)
+    return listnew

@@ -3,12 +3,14 @@
 @author: chenwuji
 '''
 #本程序主要是生成静态的基站映射表,根据基站的位置信息,生成该基站在道路上面的映射点.最后输出备选点集
+import constant
+
 cellIdDict={}
 lukouDict={}
 roadAdjDict={}
 extraDis = 200
-rootDir = '/Users/chenwuji/Documents/RoadMatch/'
-eachRoadSplitLen = 50
+rootDir = constant.rootPath
+eachRoadSplitLen = 30
 
 class JiZhanPoint:
     def __init__(self,x,y,range):

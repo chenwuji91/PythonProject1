@@ -7,6 +7,7 @@ import sys
 import glob
 import os
 import pickle
+import constant
 #传入两个点  计算时间和空间相似度
 
 voteMatrix = []
@@ -15,7 +16,7 @@ lukouDict={}
 roadAdjDict={}
 luceDict={}
 houxuanPointDict={}
-rootDir = '/Users/chenwuji/Documents/RoadMatch/'
+rootDir = constant.rootPath
 class JiZhanPoint:
     def __init__(self,x,y,range):
 
@@ -24,7 +25,6 @@ class JiZhanPoint:
         self.range = range
 class RoadIntersectionPoint:
     def __init__(self,x,y):
-
         self.x = x
         self.y = y
 class HouxuanPoint:
@@ -37,7 +37,6 @@ class HouxuanPoint:
         self.voteDict = {}
     def setDisToJizhan(self, JizhanPoint):
         self.distanceToJizhan = calculate(self.x, self.y, JizhanPoint.x, JizhanPoint.y)
-
 class HouXuanPath:#注意这个类和上一个类会保存
     def __init__(self, path, length, dis_similarity,time, time_similarity, point1 ,point2):
         self.path = path  #List类型  保存的是从下一个行驶的路口到下下个点的路口中间的完整的路径
@@ -60,14 +59,14 @@ class HouXuanPath:#注意这个类和上一个类会保存
             return 0
 
 def readcellIdSheet():
-        f =open(rootDir+'cellIdSheet.txt')
+        f =open(rootDir + constant.cellIDSheet)
         for eachline in f:
             list1 = eachline.split('\t')
             cellId = list1[0]
             cellIdDict.setdefault(cellId,JiZhanPoint(float(list1[1]),float(list1[2]),float(list1[3])))
         f.close()
 def readLukou():
-        f =open(rootDir+'RoadData/lukou.txt')
+        f =open(rootDir + constant.lukouInfo)
         for eachline in f:
             list1 = eachline.split()
             cellId = list1[0]
@@ -75,19 +74,19 @@ def readLukou():
             lukouDict.setdefault(cellId,RoadIntersectionPoint(float(position[0]),float(position[1])))
         f.close()
 def readAdj():
-        f =open(rootDir+'RoadData/adj.txt')
+        f =open(rootDir + constant.adjInfo)
         for eachline in f:
             list1 = eachline.split()
             roadAdjDict.setdefault(list1[0],list1[1:len(list1)])
         f.close()
 
 def readLuceYuanshi():
-    dataFile = file(rootDir+'zyc/result.data')
+    dataFile = file(rootDir + constant.luceYuanshi)
     global luceDict
     luceDict = pickle.load(dataFile)
 
 def readLuce():
-    dir = rootDir+'szfOut04144WithDate/'  # 要访问文件夹路径
+    dir = rootDir + constant.luceProcessed  # 要访问文件夹路径
     f = glob.glob(dir + '//*')
     for file in f:
         filename = os.path.basename(file)
@@ -109,7 +108,7 @@ def readLuce():
         f.close()
 
 def readHouXuanPoint():
-    f = open(rootDir+'HouXuanPointInfo/HouXuanPP200.txt')
+    f = open(rootDir + constant.houxuanPointPath)
     for eachline in f:
         list1 = eachline.split(':')
         point0 = list1[0]
@@ -140,7 +139,6 @@ def nearestPath(point1,point2, G):
     return nx.dijkstra_path(G, point1 , point2)
 
 def nearestPathLen(point1,point2, G):
-
     return nx.dijkstra_path_length(G, point1, point2)
 
 def voteMatrixInit(trace):
@@ -308,7 +306,7 @@ if __name__ == '__main__':
      readAdj()
 
 
-     fileList = glob.glob(rootDir+'staticMatrixDealed/*.data')
+     fileList = glob.glob(rootDir + constant.staticMatrixOutPath + '*.data')
      print fileList
      for eachF in fileList:
          # try:
@@ -318,7 +316,7 @@ if __name__ == '__main__':
              pathdate = filename.split('.')[0]
              trace = luceDict.get(pathdate)
              readHouXuanPoint()  #加载候选点的数据
-             rootpath = rootDir+'staticMatrixDealed/'
+             rootpath = rootDir + constant.staticMatrixOutPath
              dataFile = file(rootpath+pathdate+'.data')
              smallMatrix = pickle.load(dataFile)
              voteMatrixInit(trace)
@@ -327,11 +325,16 @@ if __name__ == '__main__':
              print '开始计算票数'
              resultListWithNoProcess = gengerateBestPathWithMatrix(smallMatrix,trace)
              # sProcessed = processAgain(s)
+             datatemp = []
              for eachL in resultListWithNoProcess:
                  import tools
-                 tools.makeDir(rootDir+'result/zycdata/')
-                 writeToFile(rootDir+'result/zycdata/'+ pathdate +'.txt',str(eachL[0])+';'+
+                 tools.makeDir(rootDir + constant.resultDataOutpathWithNoProcess)
+                 writeToFile(rootDir+ constant.resultDataOutpathWithNoProcess + pathdate +'.txt',str(eachL[0])+';'+
                              str(eachL[1]) + ';' +str(eachL[2])+';'+str(eachL[3])+';'+str(eachL[4]))
+                 datatemp.extend(eachL[1])
+
+             import tempTask
+             tempTask.writeToMapForm(lukouDict,rootDir + constant.tempResultOutPath,datatemp)
          # except:
          #     print 'FailDate' + eachF
 
