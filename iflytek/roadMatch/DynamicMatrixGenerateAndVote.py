@@ -35,6 +35,8 @@ class HouxuanPoint:
         self.roadIntersection2 = roadIntersection2
         self.voteCount = int(0)  # 获得的票数  票数是对象本身的属性
         self.voteDict = {}
+    def setDisToJizhan(self, JizhanPoint):
+        self.distanceToJizhan = calculate(self.x, self.y, JizhanPoint.x, JizhanPoint.y)
 
 class HouXuanPath:#注意这个类和上一个类会保存
     def __init__(self, path, length, dis_similarity,time, time_similarity, point1 ,point2):

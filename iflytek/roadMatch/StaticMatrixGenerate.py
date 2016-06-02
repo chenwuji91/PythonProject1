@@ -30,6 +30,8 @@ class HouxuanPoint:
         self.y = y
         self.roadIntersection1 = roadIntersection1
         self.roadIntersection2 = roadIntersection2
+    def setDisToJizhan(self, JizhanPoint):
+        self.distanceToJizhan = calculate(self.x, self.y, JizhanPoint.x, JizhanPoint.y)
 
 class HouXuanPath:#注意这个类和上一个类会保存
     def __init__(self, path, length, dis_similarity,time, time_similarity, point1 ,point2):
@@ -104,7 +106,6 @@ def readLuceYuanshi():
     dataFile = file(rootDir+'MovingSeq/szf.data')
     global luceDict
     luceDict = pickle.load(dataFile)
-
 
 def readHouXuanPoint():
     f = open(rootDir+'HouXuanPointInfo/HouXuanPP200.txt')
@@ -221,8 +222,8 @@ def disSimilarity(point1,point2,distance,G, time_point, volicity): #传入的是
             self.calculateShortest()
 
         def calculateShortest(self):
-            minP1 = min(self.point1.roadIntersection1,self.point1.roadIntersection2)
-            minP2 = min(self.point2.roadIntersection1,self.point2.roadIntersection2)
+            minP1 = min(self.point1.roadIntersection1, self.point1.roadIntersection2)
+            minP2 = min(self.point2.roadIntersection1, self.point2.roadIntersection2)
             maxP1 = max(self.point1.roadIntersection1, self.point1.roadIntersection2)
             maxP2 = max(self.point2.roadIntersection1, self.point2.roadIntersection2)
             if minP1 == minP2 and maxP1 == maxP2:
@@ -265,7 +266,10 @@ def disSimilarity(point1,point2,distance,G, time_point, volicity): #传入的是
     # print nf.nearestPath
     len1 = nf.nearestPathLen
     time1 = timeSimilarity(volicity,len1)
-    shortestPath = HouXuanPath(nf.nearestPath,len1 ,calSimilarity(distance,len1),time1,calSimilarity(time_point,time1),point1 ,point2)
+    # shortestPath = HouXuanPath(nf.nearestPath,len1 ,calSimilarity(distance,len1),time1,calSimilarity(time_point,time1),point1 ,point2)
+    shortestPath = HouXuanPath(nf.nearestPath, len1, calSimilarity(distance, len1), time1, calSimilarity(time_point, time1), point1, point2)
+
+    # (self, path, length, dis_similarity, time, time_similarity, point1, point2):
     return shortestPath  #返回的是一个类  包含节点中间最短路径 以及该候选路径的相似度
 
 
@@ -284,6 +288,7 @@ def roadMatch(pathdate):
         Houxuan2List = houxuanPointDict.get(trace[pointPair+1][0])  #下一个点所有的候选点集
         point1 = cellIdDict.get(trace[pointPair][0])  #point1代表点的详细信息 HouxuanPoint的点的详细信息  类型为JiZhanPoint
         point2 = cellIdDict.get(trace[pointPair+1][0])  #point点的详细信息
+
         point12Dis = calculate(point1.x, point1.y, point2.x, point2.y)  #两个点的实际距离
         timeHouxuan1 = timetranslate(trace[pointPair][1])
         timeHouxuan2 = timetranslate(trace[pointPair+1][1])
@@ -292,9 +297,11 @@ def roadMatch(pathdate):
         point1Matrix = []  # 和第pointPair个实际点的第i个候选点相关的 所有候选点之间的关系
         for i in range(len(Houxuan1List)):              # for eachPoint1 in Houxuan1List:
             eachPoint1 = Houxuan1List[i]
+            eachPoint1.setDisToJizhan(cellIdDict.get(trace[pointPair][0]))  #设置点到基站的距离字段
             point2Matrix = []  #和第pointPair个实际点的第i个候选点相关的 第j个点 之间的关系    对于HouxuanList可以认为每个基站点的候选点是唯一的  但是 如果一段移动序列出现两个连续的基站 这个基站会获得重复的票数叠加
             for j in range(len(Houxuan2List)):    #for eachPoint2 in Houxuan2List:
                 eachPoint2 = Houxuan2List[j]
+                eachPoint2.setDisToJizhan(cellIdDict.get(trace[pointPair+1][0]))  #设置点到基站的距离字段
                 sPath = disSimilarity(eachPoint1, eachPoint2, point12Dis, G, time12, 12)   #传入的是两个原始点的两个候选点 返回的可以看作是一条边  保存的是两个点之间的关系
                 point2Matrix.append(sPath)
             point1Matrix.append(point2Matrix)
