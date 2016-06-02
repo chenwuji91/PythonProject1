@@ -6,7 +6,7 @@
 cellIdDict={}
 lukouDict={}
 roadAdjDict={}
-extraDis = 200
+extraDis = 500
 rootDir = '/Users/chenwuji/Documents/RoadMatch/'
 
 class JiZhanPoint:
