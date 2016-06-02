@@ -9,7 +9,7 @@ path2 = '/Users/chenwuji/Documents/苏州出租车/ubuntu结果/suzhou/路段分
 path3 = '/Users/chenwuji/Documents/苏州出租车/ubuntu结果/suzhou/路段分时段车速信息282930/'
 path4 = '/Users/chenwuji/Documents/苏州出租车/windows结果/result/'
 pathList = [path1,path2,path3,path4]
-weekend = [4,5,11,12,18,19,25,26]
+weekend = [3,4,10,11,18,17,25,24,31,1]
 
 import glob
 import os
@@ -21,7 +21,6 @@ def fileListAll():
 
 
 def writeToFile(fileName, data):
-    # f = file(rootpath+"/路段分时段车速信息/"+fileName, "a+")
     f = file('/Users/chenwuji/Documents/苏州出租车/resultReduced2/' + fileName, "a+")
     f.writelines(data)
     f.close()

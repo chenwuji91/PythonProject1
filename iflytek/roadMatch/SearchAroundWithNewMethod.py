@@ -8,9 +8,9 @@ import constant
 cellIdDict={}
 lukouDict={}
 roadAdjDict={}
-extraDis = 200
+extraDis = 100
 rootDir = constant.rootPath
-eachRoadSplitLen = 30
+eachRoadSplitLen = 50
 
 class JiZhanPoint:
     def __init__(self,x,y,range):
@@ -22,14 +22,14 @@ class RoadIntersectionPoint:
         self.x = x
         self.y = y
 def readcellIdSheet():
-        f =open(rootDir + 'RoadData/cellIdSheetOnlyXiaoQU.txt')
+        f =open(rootDir + constant.cellIDInfoStatic)
         for eachline in f:
             list1 = eachline.split('\t') 
             cellId = list1[0]          
             cellIdDict.setdefault(cellId,JiZhanPoint(float(list1[1]),float(list1[2]),float(list1[3])))
         f.close() 
 def readLukou():
-        f =open(rootDir + 'RoadData/lukou.txt')
+        f =open(rootDir + constant.lukouInfo)
         for eachline in f:
             list1 = eachline.split()     
             cellId = list1[0]       
@@ -37,7 +37,7 @@ def readLukou():
             lukouDict.setdefault(cellId,RoadIntersectionPoint(float(position[0]),float(position[1])))
         f.close()
 def readAdj():
-        f =open(rootDir + 'RoadData/adj.txt')
+        f =open(rootDir + constant.adjInfo)
         for eachline in f:
             list1 = eachline.split() 
 
@@ -133,7 +133,7 @@ def calculate(lon1, lat1, lon2, lat2): # 经度1，纬度1，经度2，纬度2 �
     return c * r * 1000
 
 def writeToFile(allHouxuanPoint):
-    f = file(rootDir + "HouXuanPointInfo/HouxuanNew"+str(extraDis)+'-'+ str(eachRoadSplitLen) +".txt", "a+")
+    f = file(rootDir + constant.houxuanOutPathWithNewMethod +str(extraDis)+'-'+ str(eachRoadSplitLen) +".txt", "a+")
     for eachCellTable in allHouxuanPoint:
         li = eachCellTable + ":"
         f.writelines(li)

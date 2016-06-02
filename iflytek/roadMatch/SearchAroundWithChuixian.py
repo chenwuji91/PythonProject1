@@ -3,11 +3,12 @@
 @author: chenwuji
 '''
 #本程序主要是生成静态的基站映射表,根据基站的位置信息,生成该基站在道路上面的映射点.最后输出备选点集
+import constant
 cellIdDict={}
 lukouDict={}
 roadAdjDict={}
 extraDis = 500
-rootDir = '/Users/chenwuji/Documents/RoadMatch/'
+rootDir = constant.rootPath
 
 class JiZhanPoint:
     def __init__(self,x,y,range):
@@ -21,14 +22,14 @@ class RoadIntersectionPoint:
         self.x = x
         self.y = y
 def readcellIdSheet():
-        f =open(rootDir + 'RoadData/cellIdSheetOnlyXiaoQU.txt')
+        f =open(rootDir + constant.cellIDInfoStatic)
         for eachline in f:
             list1 = eachline.split('\t') 
             cellId = list1[0]          
             cellIdDict.setdefault(cellId,JiZhanPoint(float(list1[1]),float(list1[2]),float(list1[3])))
         f.close() 
 def readLukou():
-        f =open(rootDir + 'RoadData/lukou.txt')
+        f =open(rootDir + constant.lukouInfo)
         for eachline in f:
             list1 = eachline.split()     
             cellId = list1[0]       
@@ -36,7 +37,7 @@ def readLukou():
             lukouDict.setdefault(cellId,RoadIntersectionPoint(float(position[0]),float(position[1])))
         f.close()
 def readAdj():
-        f =open(rootDir + 'RoadData/adj.txt')
+        f =open(rootDir + constant.adjInfo)
         for eachline in f:
             list1 = eachline.split() 
 
@@ -157,7 +158,7 @@ def calculate(lon1, lat1, lon2, lat2): # 经度1，纬度1，经度2，纬度2 �
     return c * r * 1000
 
 def writeToFile(allHouxuanPoint):
-    f = file(rootDir + "HouXuanPointInfo/HouxuanPP"+str(extraDis)+".txt", "a+")
+    f = file(rootDir + constant.houxuanOutPath + str(extraDis)+".txt", "a+")
     for eachCellTable in allHouxuanPoint:
         li = eachCellTable + ":"
         f.writelines(li)

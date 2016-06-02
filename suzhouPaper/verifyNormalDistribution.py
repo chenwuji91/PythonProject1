@@ -4,7 +4,8 @@
 '''
 #检验正太分布
 
-path4 = '/Users/chenwuji/Documents/苏州出租车/resultReduced2/'
+path1 = 'Users/chenwuji/Documents/苏州出租车/原始数据和中间结果/完整的速度信息数据/suzhou1-10/result/'
+path2 = '/Users/chenwuji/Documents/苏州出租车/原始数据和中间结果/完整的速度信息数据/路段分时段车速信息/'
 outputPath = '/Users/chenwuji/Documents/苏州出租车/NormalDisResult/'
 fileList = []
 from scipy.stats import kstest

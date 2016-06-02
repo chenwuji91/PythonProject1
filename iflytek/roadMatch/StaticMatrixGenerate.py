@@ -164,7 +164,7 @@ def nearestPath(point1, point2, G):
     elif lukouCache.__contains__((point2, point1)):
         return lukouCache.get((point2, point1))[1]
     else:
-        # print "Call External Dijkstra"
+        print "Call External Dijkstra"
         return nearestPathWithDijkstra(point1, point2, G)
 def nearestPathLen(point1, point2, G):
     if lukouCache.__contains__((point1,point2)):
@@ -178,6 +178,17 @@ def nearestPathWithDijkstra(point1,point2, G):
     return nx.dijkstra_path(G, point1 , point2)
 def nearestPathLenWithDijkstra(point1,point2, G):
     return nx.dijkstra_path_length(G, point1, point2)
+def traceLegalCheck(trace):
+    tracenew = []
+    for pointPair in range(len(trace)):
+        point = cellIdDict.get(trace[pointPair][0])
+        print type(point)
+        if isinstance(point,HouxuanPoint):
+            tracenew.append(pointPair)
+    return tracenew
+
+
+
 
 #传入的参数类型  point1 point2 类型为HouxuanPoint 类型 为 候选点  distance为真实点之间的距离  time_point为时间差  volicity为内置的速度值
 def disSimilarity(point1,point2,distance,G, time_point, volicity): #传入的是两个点的信息 以及两个实际点之间的距离 点的定义如上个HouxuanPoint类所示  返回的是距离的相似度的值(以及当前相似度下面的道路路径)  相似度的值计算需要两个点的直线距离 以及点在道路上面的最短距离
@@ -262,6 +273,7 @@ def roadMatch(pathdate):
         hhh = int(HouxuanTime[len(HouxuanTime) - 6:len(HouxuanTime) - 4])
         return sss + mmm * 60 + hhh * 3600
     trace = luceDict.get(pathdate)  # 开始进行一条移动序列的匹配工作  这个移动序列可以看成是有序的
+    trace = traceLegalCheck(trace)
     G = graphGenerate()
     print trace   #开始处理一条轨迹
     smallMatrix = []  # 数组的最外层  即该维度表示的是是第几个小数组    索引为0到len(trace)-1的索引  表示的是两个实际点之间的小矩阵的复杂关系    最后这个smallMatrix保存饿的是这个整个序列的全局矩阵

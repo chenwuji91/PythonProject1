@@ -2,13 +2,14 @@
 '''
 @author: chenwuji
 '''
+import constant
 lukouDict = {}
 lukouCache = {}
 cellIdDict={}
 roadAdjDict={}
 luceDict={}
 houxuanPointDict={}
-rootDir = '/Users/chenwuji/Documents/RoadMatch/'
+rootDir = constant.rootPath
 
 import glob
 import os
@@ -45,7 +46,7 @@ def calculate(lon1, lat1, lon2, lat2): # 经度1，纬度1，经度2，纬度2 �
 
 
 def readLukou():
-    f = open(rootDir + 'RoadData/lukou.txt')
+    f = open(rootDir + constant.lukouInfo)
     for eachline in f:
         list1 = eachline.split()
         cellId = list1[0]
@@ -55,7 +56,7 @@ def readLukou():
 
 
 def readAdj():
-    f = open(rootDir + 'RoadData/adj.txt')
+    f = open(rootDir + constant.adjInfo)
     for eachline in f:
         list1 = eachline.split()
         roadAdjDict.setdefault(list1[0], list1[1:len(list1)])
@@ -66,7 +67,7 @@ def readAdj():
 
 
 def readRoadIntersectionCacheFromTxt():
-    f = open(rootDir + 'LukouDisStatic.txt')
+    f = open(rootDir + constant.roadIntersectionDisCache)
     for eachLine in f:
         eachLine = eachLine.split('\n')[0]
         list1 = eachLine.split(';')

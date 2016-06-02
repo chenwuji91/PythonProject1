@@ -5,14 +5,18 @@
 
 rootPath = '/Users/chenwuji/Documents/RoadMatch/'
 
-cellIDSheet = 'cellIdSheet.txt'
+cellIDInfoStatic = 'RoadData/cellIdSheetOnlyXiaoQU.txt'
+houxuanOutPath = 'HouXuanPointInfo/HouxuanPP'
+houxuanOutPathWithNewMethod = "HouXuanPointInfo/HouxuanNew"
+
+cellIDSheet = 'RoadData/cellIdSheetOnlyXiaoQU.txt'
 lukouInfo = 'RoadData/lukou.txt'
 adjInfo = 'RoadData/adj.txt'
-luceProcessed = 'szfOut04144WithDate/'
-luceYuanshi = 'zyc/result.data'
-houxuanPointPath = 'HouXuanPointInfo/HouXuanPP200.txt'
-roadIntersectionDisCache = 'LukouDisStatic.txt'
-staticMatrixOutPath = 'staticMatrixDealed/'
+luceProcessed = '经过翌晨处理的数据/'
+luceYuanshi = 'NotProcessed/szf.data'
+houxuanPointPath = 'HouXuanPointInfo/HouxuanNew200-50.txt'
+roadIntersectionDisCache = 'RoadData/LukouDisStatic.txt'
+staticMatrixOutPath = 'MidTermData/staticMatrixWithNewHouxuan/'
 
-resultDataOutpathWithNoProcess = 'zycdata/result/'
+resultDataOutpathWithNoProcess = 'zyc/result/'
 tempResultOutPath = 'zyc/result.js'
