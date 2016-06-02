@@ -6,7 +6,7 @@
 cellIdDict={}
 lukouDict={}
 roadAdjDict={}
-extraDis = 300
+extraDis = 200
 rootDir = '/Users/chenwuji/Documents/RoadMatch/'
 eachRoadSplitLen = 50
 

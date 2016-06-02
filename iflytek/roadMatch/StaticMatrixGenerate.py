@@ -102,8 +102,10 @@ def readLuce():
             luceDict.setdefault(date,listPoint)
         f.close()
 
+
 def readLuceYuanshi():
-    dataFile = file(rootDir+'MovingSeq/szf.data')
+    # dataFile = file(rootDir+'MovingSeq/szf.data')
+    dataFile = file(rootDir+'zyc/result.data')
     global luceDict
     luceDict = pickle.load(dataFile)
 
@@ -353,19 +355,19 @@ def smallMatrixToFileWithPickle(filename, smallMatrix):
 
 if __name__ == '__main__':
      # 基本数据加载
-     readLuce()
-     # readLuceYuanshi()
+     # readLuce()
+     readLuceYuanshi()
      readcellIdSheet()
      readLukou()
      readAdj()
      readHouXuanPoint()
      readRoadIntersectionCacheFromTxt()
      for eachD in luceDict:
-        try:
+        # try:
             roadMatch(eachD)
-        except:
-            print 'Fail',
-            print eachD
+        # except:
+        #     print 'Fail',
+        #     print eachD
 
 
 

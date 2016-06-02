@@ -82,7 +82,7 @@ def readAdj():
         f.close()
 
 def readLuceYuanshi():
-    dataFile = file(rootDir+'MovingSeq/szf.data')
+    dataFile = file(rootDir+'zyc/result.data')
     global luceDict
     luceDict = pickle.load(dataFile)
 
@@ -308,7 +308,7 @@ if __name__ == '__main__':
      readAdj()
 
 
-     fileList = glob.glob(rootDir+'staticMatrix/*.data')
+     fileList = glob.glob(rootDir+'staticMatrixDealed/*.data')
      print fileList
      for eachF in fileList:
          # try:
@@ -318,7 +318,7 @@ if __name__ == '__main__':
              pathdate = filename.split('.')[0]
              trace = luceDict.get(pathdate)
              readHouXuanPoint()  #加载候选点的数据
-             rootpath = rootDir+'staticMatrix/'
+             rootpath = rootDir+'staticMatrixDealed/'
              dataFile = file(rootpath+pathdate+'.data')
              smallMatrix = pickle.load(dataFile)
              voteMatrixInit(trace)
@@ -328,7 +328,9 @@ if __name__ == '__main__':
              resultListWithNoProcess = gengerateBestPathWithMatrix(smallMatrix,trace)
              # sProcessed = processAgain(s)
              for eachL in resultListWithNoProcess:
-                 writeToFile(rootDir+'result/notProcessed/'+ pathdate +'.txt',str(eachL[0])+';'+
+                 import tools
+                 tools.makeDir(rootDir+'result/zycdata/')
+                 writeToFile(rootDir+'result/zycdata/'+ pathdate +'.txt',str(eachL[0])+';'+
                              str(eachL[1]) + ';' +str(eachL[2])+';'+str(eachL[3])+';'+str(eachL[4]))
          # except:
          #     print 'FailDate' + eachF
