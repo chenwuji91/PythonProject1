@@ -9,12 +9,14 @@ def traceLegalCheck(trace,cellIdDict,JiZhanPoint,houxuanPointDict):
     tracenew = []
     for pointPair in range(len(trace)):
         point = cellIdDict.get(trace[pointPair][0])
-        if len(tracenew) > 0:   #从第二个点开始 如果现在点和满足条件的前一个点的距离超过 2 km 则不添加这个点
-            if calculate(point.x, point.y, cellIdDict.get(tracenew[len(tracenew)-1][0]).x, cellIdDict.get(tracenew[len(tracenew)-1][0]).y) > 2000:
-                break
+
         if isinstance(point,JiZhanPoint):
                 Houxuan1List = houxuanPointDict.get(trace[pointPair][0])  # 当前的点的所有候选点集  trace保存的是一个元组  [0]号下标表示基站点信息  [1]号下标表示时间戳
                 if(len(Houxuan1List)>0):
+                    # if len(tracenew) > 0:  # 从第二个点开始 如果现在点和满足条件的前一个点的距离超过 2 km 则不添加这个点
+                    #     # if calculate(point.x, point.y, cellIdDict.get(tracenew[len(tracenew) - 1][0]).x,
+                    #     #              cellIdDict.get(tracenew[len(tracenew) - 1][0]).y) > 2000:
+                    #     #     break
                     tracenew.append(trace[pointPair])
     return tracenew
 

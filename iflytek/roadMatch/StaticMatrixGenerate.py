@@ -7,6 +7,7 @@ import glob
 import os
 import pickle
 import constant
+import math
 #传入两个点  计算时间和空间相似度
 rootDir = constant.rootPath
 cellIdDict={}
@@ -74,29 +75,29 @@ def readAdj():
             list1 = eachline.split()
             roadAdjDict.setdefault(list1[0],list1[1:len(list1)])
         f.close()
-# def readLuce():
-#     dir = rootDir + constant.luceProcessed # 要访问文件夹路径
-#     f = glob.glob(dir + '//*')
-#     for file in f:
-#         filename = os.path.basename(file)
-#         # print filename
-#         f = open(dir + '//' + filename, 'r')
-#         for eachline in f:
-#             list1 = eachline[1:(eachline.__len__()-2)]
-#             list1 = list1.split(',CompactBuffer')
-#             date = list1[0]
-#             xulie = list1[1]
-#             list2 = xulie[1:(xulie.__len__()-1)].split(', ')
-#             listPoint = []
-#             for singleP in list2:
-#                 singleP = singleP[1:(len(singleP) - 1)]
-#                 list1 = singleP.split(",")
-#                 # print list1[0]#候选点1 基站
-#                 # print list1[1]#候选点2 时间
-#                 listPoint.append((list1[0], list1[1]))  # 将序列点变成元组的形式
-#                 # 在下面进行单个序列的最佳相似度的求解#
-#             luceDict.setdefault(date,listPoint)
-#         f.close()
+def readLuce():
+    dir = rootDir + constant.luceProcessed # 要访问文件夹路径
+    f = glob.glob(dir + '//*')
+    for file in f:
+        filename = os.path.basename(file)
+        # print filename
+        f = open(dir + '//' + filename, 'r')
+        for eachline in f:
+            list1 = eachline[1:(eachline.__len__()-2)]
+            list1 = list1.split(',CompactBuffer')
+            date = list1[0]
+            xulie = list1[1]
+            list2 = xulie[1:(xulie.__len__()-1)].split(', ')
+            listPoint = []
+            for singleP in list2:
+                singleP = singleP[1:(len(singleP) - 1)]
+                list1 = singleP.split(",")
+                # print list1[0]#候选点1 基站
+                # print list1[1]#候选点2 时间
+                listPoint.append((list1[0], list1[1]))  # 将序列点变成元组的形式
+                # 在下面进行单个序列的最佳相似度的求解#
+            luceDict.setdefault(date,listPoint)
+        f.close()
 def readLuceYuanshi():
     # dataFile = file(rootDir+'MovingSeq/szf.data')
     dataFile = file(rootDir+ constant.luceYuanshi)
@@ -202,6 +203,13 @@ def disSimilarity(point1,point2,distance,G, time_point, volicity): #传入的是
         value1 = 1 - abs(shijiP-HouxuanP)/(shijiP+0.0000001)
         return max(0,value1)
 
+    def spaceSimilarityNew(point1,point2):
+        p2pDis = calculate(point1.x, point1.y, point2.x, point2.y)
+        p2ToJizhanDis = point2.distanceToJizhan
+        return math.exp(-p2pDis * 0.1) + 1/math.log10(p2ToJizhanDis)
+
+
+
     class NearestPathInfo:
         def __init__(self, point1, point2, G):
             self.point1 = point1
@@ -254,8 +262,8 @@ def disSimilarity(point1,point2,distance,G, time_point, volicity): #传入的是
     # print nf.nearestPath
     len1 = nf.nearestPathLen
     time1 = timeSimilarity(volicity,len1)
-    # shortestPath = HouXuanPath(nf.nearestPath,len1 ,calSimilarity(distance,len1),time1,calSimilarity(time_point,time1),point1 ,point2)
-    shortestPath = HouXuanPath(nf.nearestPath, len1, calSimilarity(distance, len1), time1, calSimilarity(time_point, time1), point1, point2)
+    # shortestPath = HouXuanPath(nf.nearestPath,len1 ,空间近似度  ,time1,时间近似度  ,point1 ,point2)
+    shortestPath = HouXuanPath(nf.nearestPath, len1, spaceSimilarityNew(point1, point2), time1, 1, point1, point2)
 
     # (self, path, length, dis_similarity, time, time_similarity, point1, point2):
     return shortestPath  #返回的是一个类  包含节点中间最短路径 以及该候选路径的相似度

@@ -310,15 +310,15 @@ if __name__ == '__main__':
 
      readLuceYuanshi()
      readcellIdSheet()
+
      readLukou()
      readAdj()
      readHouXuanPoint()  # 加载候选点的数据
 
-
      fileList = glob.glob(rootDir + constant.staticMatrixOutPath + '*.data')
      print fileList
      for eachF in fileList:
-         # try:
+          try:
              global voteMatrix
              voteMatrix = []
              filename = os.path.basename(eachF)
@@ -338,15 +338,17 @@ if __name__ == '__main__':
              datatemp = []
              for eachL in resultListWithNoProcess:
                  import tools
-                 tools.makeDir(rootDir + constant.resultDataOutpathWithNoProcess)
-                 writeToFile(rootDir+ constant.resultDataOutpathWithNoProcess + pathdate +'.txt',str(eachL[0])+';'+
+                 tools.makeDir(rootDir + constant.resultDataOutpathLuce)
+                 writeToFile(rootDir+ constant.resultDataOutpathLuce + pathdate +'.txt',str(eachL[0])+';'+
                              str(eachL[1]) + ';' +str(eachL[2])+';'+str(eachL[3])+';'+str(eachL[4]))
                  datatemp.extend(eachL[1])
 
              import tempTask
-             tempTask.writeToMapForm(lukouDict,rootDir + constant.tempResultOutPath,datatemp)
-         # except:
-         #     print 'FailDate' + eachF
+             tempTask.writeToMapLuce(pathdate, rootDir + constant.luceResultOut,datatemp)
+             # tempTask.writeToMapForm(lukouDict,rootDir + constant.tempResultOutPath,datatemp)
+
+          except:
+              print 'FailDate' + eachF
 
 
 

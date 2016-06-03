@@ -17,3 +17,17 @@ def writeToMapForm(lukouDict,outPath,dataList):
     s = s[0:len(s)-1] + '],"count":"1"},'
     tools.writeToFile(outPath, s)
     print s
+
+
+
+def writeToMapLuce(pathdate, outPath,dataList):
+    import tools
+    dataList = tools.process(dataList)
+    if len(dataList)<1:
+        return
+    s = pathdate + ':'
+    for eachP in dataList:
+        s = s + str(eachP) + ','
+    s = s + '\n'
+    tools.writeToFile(outPath, s)
+    print s
