@@ -8,6 +8,7 @@ import glob
 import os
 import pickle
 import constant
+import tools
 #传入两个点  计算时间和空间相似度
 
 voteMatrix = []
@@ -136,10 +137,17 @@ def calculate(lon1, lat1, lon2, lat2): # 经度1，纬度1，经度2，纬度2 �
 import networkx as nx
 
 def nearestPath(point1,point2, G):
-    return nx.dijkstra_path(G, point1 , point2)
+    try:
+        return nx.dijkstra_path(G, point1 , point2)
+    except:
+        print 'No Path!!!'
 
 def nearestPathLen(point1,point2, G):
-    return nx.dijkstra_path_length(G, point1, point2)
+    try:
+        return nx.dijkstra_path_length(G, point1, point2)
+    except:
+        print 'No Path!!!'
+
 
 def voteMatrixInit(trace):
     for m in range(len(trace)):
@@ -304,6 +312,7 @@ if __name__ == '__main__':
      readcellIdSheet()
      readLukou()
      readAdj()
+     readHouXuanPoint()  # 加载候选点的数据
 
 
      fileList = glob.glob(rootDir + constant.staticMatrixOutPath + '*.data')
@@ -315,7 +324,8 @@ if __name__ == '__main__':
              filename = os.path.basename(eachF)
              pathdate = filename.split('.')[0]
              trace = luceDict.get(pathdate)
-             readHouXuanPoint()  #加载候选点的数据
+             trace = tools.traceLegalCheck(trace,cellIdDict,JiZhanPoint,houxuanPointDict)
+
              rootpath = rootDir + constant.staticMatrixOutPath
              dataFile = file(rootpath+pathdate+'.data')
              smallMatrix = pickle.load(dataFile)

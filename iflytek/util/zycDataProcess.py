@@ -12,15 +12,16 @@ def readData():
     initdate = 20202020
     inittime = 100000
     allDataDict = {}
-    f = open(rootDir + 'JiuHuaMidRoadWithHuangShanMidRoad_20160531_1730_1830.txt')
+    f = open(rootDir + 'JiuHuaMidRoadWithHuangShanMidRoad_20160531_1750_1800_out.txt')
     for eachline in f:
         initdate = initdate + 1
         eachline = eachline.split('\n')[0]
         list = eachline.split('\t')
         dataOneLine = []
         if len(list)>4:
+
             time1 = tools.timetranslate(list[2])
-            time2 = tools.timetranslate(list[3])
+            time2 = tools.timetranslate(list[2]) + 200
             pointList = list[1].split(',')
             timeinterval = (time2-time1)/len(pointList)
             for eachP in pointList:
@@ -32,7 +33,7 @@ def readData():
             print list
         allDataDict.setdefault(str(initdate),dataOneLine)
     f.close()
-    tools.toFileWithPickle(rootDir + 'result', allDataDict)
+    tools.toFileWithPickle(rootDir + 'result_out', allDataDict)
 
 
 

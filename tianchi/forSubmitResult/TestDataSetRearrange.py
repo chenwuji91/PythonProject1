@@ -13,8 +13,8 @@ songToSinger = {}
 songScore = {}
 singerScore = {}
 singerAllScoreByDate ={}
-inpath = '/Users/chenwuji/Documents/skypool/测评相关/6-2/*'
-outpath = '/Users/chenwuji/Documents/skypool/测评相关/PredictResult0602.txt'
+inpath = '/Users/chenwuji/Documents/skypool/测评相关/6-3/*'
+outpath = '/Users/chenwuji/Documents/skypool/测评相关/PredictResult0603.txt'
 
 def readSingerSong():
     f = open('/Users/chenwuji/Documents/skypool/mars_tianchi_songs_withSinger.csv')

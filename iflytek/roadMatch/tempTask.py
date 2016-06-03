@@ -7,6 +7,8 @@
 def writeToMapForm(lukouDict,outPath,dataList):
     import tools
     dataList = tools.process(dataList)
+    if len(dataList)<1:
+        return
     s = '{"geo":['
     for eachP in dataList:
         lati = lukouDict.get(eachP).x

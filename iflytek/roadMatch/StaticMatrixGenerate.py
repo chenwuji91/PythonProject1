@@ -12,7 +12,7 @@ rootDir = constant.rootPath
 cellIdDict={}
 lukouDict={}
 roadAdjDict={}
-luceDict={}
+# luceDict={}
 houxuanPointDict={}
 lukouCache = {}
 
@@ -74,29 +74,29 @@ def readAdj():
             list1 = eachline.split()
             roadAdjDict.setdefault(list1[0],list1[1:len(list1)])
         f.close()
-def readLuce():
-    dir = rootDir + constant.luceProcessed # 要访问文件夹路径
-    f = glob.glob(dir + '//*')
-    for file in f:
-        filename = os.path.basename(file)
-        # print filename
-        f = open(dir + '//' + filename, 'r')
-        for eachline in f:
-            list1 = eachline[1:(eachline.__len__()-2)]
-            list1 = list1.split(',CompactBuffer')
-            date = list1[0]
-            xulie = list1[1]
-            list2 = xulie[1:(xulie.__len__()-1)].split(', ')
-            listPoint = []
-            for singleP in list2:
-                singleP = singleP[1:(len(singleP) - 1)]
-                list1 = singleP.split(",")
-                # print list1[0]#候选点1 基站
-                # print list1[1]#候选点2 时间
-                listPoint.append((list1[0], list1[1]))  # 将序列点变成元组的形式
-                # 在下面进行单个序列的最佳相似度的求解#
-            luceDict.setdefault(date,listPoint)
-        f.close()
+# def readLuce():
+#     dir = rootDir + constant.luceProcessed # 要访问文件夹路径
+#     f = glob.glob(dir + '//*')
+#     for file in f:
+#         filename = os.path.basename(file)
+#         # print filename
+#         f = open(dir + '//' + filename, 'r')
+#         for eachline in f:
+#             list1 = eachline[1:(eachline.__len__()-2)]
+#             list1 = list1.split(',CompactBuffer')
+#             date = list1[0]
+#             xulie = list1[1]
+#             list2 = xulie[1:(xulie.__len__()-1)].split(', ')
+#             listPoint = []
+#             for singleP in list2:
+#                 singleP = singleP[1:(len(singleP) - 1)]
+#                 list1 = singleP.split(",")
+#                 # print list1[0]#候选点1 基站
+#                 # print list1[1]#候选点2 时间
+#                 listPoint.append((list1[0], list1[1]))  # 将序列点变成元组的形式
+#                 # 在下面进行单个序列的最佳相似度的求解#
+#             luceDict.setdefault(date,listPoint)
+#         f.close()
 def readLuceYuanshi():
     # dataFile = file(rootDir+'MovingSeq/szf.data')
     dataFile = file(rootDir+ constant.luceYuanshi)
@@ -178,18 +178,11 @@ def nearestPathWithDijkstra(point1,point2, G):
     return nx.dijkstra_path(G, point1 , point2)
 def nearestPathLenWithDijkstra(point1,point2, G):
     return nx.dijkstra_path_length(G, point1, point2)
-def traceLegalCheck(trace):
-    tracenew = []
-    for pointPair in range(len(trace)):
-        point = cellIdDict.get(trace[pointPair][0])
-        print type(point)
-        if isinstance(point,HouxuanPoint):
-            tracenew.append(pointPair)
-    return tracenew
 
 
 
 
+import tools
 #传入的参数类型  point1 point2 类型为HouxuanPoint 类型 为 候选点  distance为真实点之间的距离  time_point为时间差  volicity为内置的速度值
 def disSimilarity(point1,point2,distance,G, time_point, volicity): #传入的是两个点的信息 以及两个实际点之间的距离 点的定义如上个HouxuanPoint类所示  返回的是距离的相似度的值(以及当前相似度下面的道路路径)  相似度的值计算需要两个点的直线距离 以及点在道路上面的最短距离
 
@@ -272,8 +265,8 @@ def roadMatch(pathdate):
         mmm = int(HouxuanTime[len(HouxuanTime) - 4:len(HouxuanTime) - 2])
         hhh = int(HouxuanTime[len(HouxuanTime) - 6:len(HouxuanTime) - 4])
         return sss + mmm * 60 + hhh * 3600
-    trace = luceDict.get(pathdate)  # 开始进行一条移动序列的匹配工作  这个移动序列可以看成是有序的
-    trace = traceLegalCheck(trace)
+    trace2 = luceDict.get(pathdate)  # 开始进行一条移动序列的匹配工作  这个移动序列可以看成是有序的
+    trace = tools.traceLegalCheck(trace2,cellIdDict,JiZhanPoint,houxuanPointDict)
     G = graphGenerate()
     print trace   #开始处理一条轨迹
     smallMatrix = []  # 数组的最外层  即该维度表示的是是第几个小数组    索引为0到len(trace)-1的索引  表示的是两个实际点之间的小矩阵的复杂关系    最后这个smallMatrix保存饿的是这个整个序列的全局矩阵
@@ -301,7 +294,7 @@ def roadMatch(pathdate):
             point1Matrix.append(point2Matrix)
         smallMatrix.append(point1Matrix)
 
-        # print '中间的结果是'
+        # print '中间的结果是'20202037
         # for i in range(len(Houxuan1List)):
         #     for j in range(len(Houxuan2List)):
         #         print str(i)+"  "+ str(j)+"  "+str(point1Matrix[i][j].dSimilarity)
