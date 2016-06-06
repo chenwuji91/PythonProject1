@@ -8,7 +8,7 @@ import constant
 cellIdDict={}
 lukouDict={}
 roadAdjDict={}
-extraDis = 0
+extraDis = 500
 rootDir = constant.rootPath
 eachRoadSplitLen = 50
 
