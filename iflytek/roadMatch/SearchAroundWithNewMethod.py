@@ -4,13 +4,20 @@
 '''
 #本程序主要是生成静态的基站映射表,根据基站的位置信息,生成该基站在道路上面的映射点.最后输出备选点集
 import constant
-
-cellIdDict={}
-lukouDict={}
-roadAdjDict={}
-extraDis = 500
-rootDir = constant.rootPath
+#间隔多久分割一次
 eachRoadSplitLen = 50
+#小区辐射范围内额外增加的距离
+extraDis = 500
+
+#基站点的Map映射
+cellIdDict={}
+#路口点的Map映射
+lukouDict={}
+#邻接矩阵的Map映射
+roadAdjDict={}
+#根目录
+rootDir = constant.rootPath
+
 
 class JiZhanPoint:
     def __init__(self,x,y,range):
@@ -61,6 +68,7 @@ def houxuanPoint(): #寻找附近的点  讲当前基站的路口点按照距离
         print '候选点集合加载完毕'
         writeToFile(allHouxuanPoint)
 
+#根据一个点和这个点周围的点
 def generateHouxuanPoint(point,nearbyPointSet):   #原始基站点   基站点周围的临近路口点的集合     返回候选点段集  点集定义的是 经纬度 属于的道路(第一个编号 第二个编号)
 
         listHouxuan = []
@@ -104,8 +112,6 @@ def generateHouxuanPoint(point,nearbyPointSet):   #原始基站点   基站点�
                 if calculate(x0,y0,xH,yH) < range0:
                     houxuanListOfOneCell.append(HouxuanPoint(xH, yH, roadPoint1, roadPoint2))
             return houxuanListOfOneCell
-
-
 
         for eachP1 in nearbyPointSet:
             listP2 = roadAdjDict.get(eachP1)

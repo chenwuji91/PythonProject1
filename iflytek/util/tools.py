@@ -2,6 +2,7 @@
 '''
 @author: chenwuji
 '''
+#工具类
 import os
 from datetime import datetime
 def timetranslate(datetime1):

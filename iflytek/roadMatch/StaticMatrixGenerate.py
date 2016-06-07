@@ -128,6 +128,7 @@ def calculate(lon1, lat1, lon2, lat2): # 经度1，纬度1，经度2，纬度2 �
     r = 6371 # 地球平均半径，单位为公里
     return c * r * 1000
 import networkx as nx
+
 def graphGenerate():
     G = nx.DiGraph()
     for eachPointPair in roadAdjDict:
@@ -142,11 +143,7 @@ def graphGenerate():
             G.add_edge(eachPointPair,anotherPoint,weight = dis)
     print "有向带权图加载完成"
     return G
-# def readRoadIntersectionCache():
-#     dataFile1 = file(rootDir+'LukouDisStatic.data','r')
-#     global lukouCache
-#     lukouCache = pickle.load(dataFile1)
-#     print 'finish'
+#加载缓存
 def readRoadIntersectionCacheFromTxt():
     f = open(rootDir + constant.roadIntersectionDisCache)
     for eachLine in f:
@@ -159,6 +156,7 @@ def readRoadIntersectionCacheFromTxt():
         lukouCache.setdefault((road1,road2),(dis,roadL))
     print len(lukouCache)
     pass
+#从缓存获取最短路径
 def nearestPath(point1, point2, G):
     if lukouCache.__contains__((point1,point2)):
         return lukouCache.get((point1, point2))[1]
@@ -167,6 +165,7 @@ def nearestPath(point1, point2, G):
     else:
         print "Call External Dijkstra"
         return nearestPathWithDijkstra(point1, point2, G)
+#从缓存获取最短路径距离
 def nearestPathLen(point1, point2, G):
     if lukouCache.__contains__((point1,point2)):
         return lukouCache.get((point1, point2))[0]
@@ -175,18 +174,18 @@ def nearestPathLen(point1, point2, G):
     else:
         # print "Call External Dijkstra"
         return nearestPathLenWithDijkstra(point1, point2, G)
+#从Dijkstra获取最短路径
 def nearestPathWithDijkstra(point1,point2, G):
     return nx.dijkstra_path(G, point1 , point2)
+#从Dijkstra获取最短路径
 def nearestPathLenWithDijkstra(point1,point2, G):
     return nx.dijkstra_path_length(G, point1, point2)
 
 
-
-
 import tools
 #传入的参数类型  point1 point2 类型为HouxuanPoint 类型 为 候选点  distance为真实点之间的距离  time_point为时间差  volicity为内置的速度值
+#计算近似度
 def disSimilarity(point1,point2,distance,G, time_point, volicity): #传入的是两个点的信息 以及两个实际点之间的距离 点的定义如上个HouxuanPoint类所示  返回的是距离的相似度的值(以及当前相似度下面的道路路径)  相似度的值计算需要两个点的直线距离 以及点在道路上面的最短距离
-
     def currentPointToNeighbourDis(point,neighbourIndex):  #当前点的信息  返回到邻居的距离 传入参数为1或者2  1为第一个邻居 2为第二个邻居
         if neighbourIndex == 1:
             neighbourC = lukouDict.get(point.roadIntersection1)
@@ -200,16 +199,13 @@ def disSimilarity(point1,point2,distance,G, time_point, volicity): #传入的是
         return road_distance/volicity
 
     def calSimilarity(shijiP ,HouxuanP ):
-        value1 = 1 - abs(shijiP-HouxuanP)/(shijiP+0.0000001)
+        value1 = 3 - abs(shijiP-HouxuanP)/(shijiP+0.0000001)
         return max(0,value1)
 
     def spaceSimilarityNew(point1,point2):
         p2pDis = calculate(point1.x, point1.y, point2.x, point2.y)
         p2ToJizhanDis = point2.distanceToJizhan
         return math.exp(-p2pDis * 0.1) + 1/math.log10(p2ToJizhanDis)
-
-
-
     class NearestPathInfo:
         def __init__(self, point1, point2, G):
             self.point1 = point1
@@ -256,17 +252,18 @@ def disSimilarity(point1,point2,distance,G, time_point, volicity): #传入的是
             if self.index_min == 3:
                 self.nearestPath = nearestPath(self.point1.roadIntersection2, self.point2.roadIntersection2, self.G)
                 self.nearestPathLen = self.point12_22_length
-
     nf = NearestPathInfo(point1, point2, G)
     # print nf.nearestPathLen
     # print nf.nearestPath
     len1 = nf.nearestPathLen
     time1 = timeSimilarity(volicity,len1)
     # shortestPath = HouXuanPath(nf.nearestPath,len1 ,空间近似度  ,time1,时间近似度  ,point1 ,point2)
-    shortestPath = HouXuanPath(nf.nearestPath, len1, spaceSimilarityNew(point1, point2), time1, 1, point1, point2)
-
+    # shortestPath = HouXuanPath(nf.nearestPath, len1, spaceSimilarityNew(point1, point2), time1, 1, point1, point2)
+    shortestPath = HouXuanPath(nf.nearestPath, len1,  calSimilarity(distance,len1) , time1, calSimilarity(time_point,time1), point1, point2)
     # (self, path, length, dis_similarity, time, time_similarity, point1, point2):
     return shortestPath  #返回的是一个类  包含节点中间最短路径 以及该候选路径的相似度
+
+
 def roadMatch(pathdate):
     def timetranslate(HouxuanTime):
         sss = int(HouxuanTime[len(HouxuanTime) - 2:len(HouxuanTime)])

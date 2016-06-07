@@ -3,6 +3,8 @@
 @author: chenwuji
 '''
 #将移动序列预处理
+#本程序是昌哥一次临时任务的处理程序
+
 rootDir = '/Users/chenwuji/Documents/RoadMatch/zyc/'
 
 

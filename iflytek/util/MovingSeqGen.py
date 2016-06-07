@@ -3,15 +3,16 @@
 @author: chenwuji
 '''
 #重新产生移动序列 产生的移动序列是标准的格式  可以直接读取为tuple的
+#将路测的数据读取  并进行序列化存储
 
 import glob
 import os
 dictAllData = {}
-fileOutPath = '/Users/chenwuji/Documents/RoadMatch/MovingSeq/'
+fileOutPath = '/Users/chenwuji/Documents/RoadMatch/NotProcessed/'
 
 def readFile():
 
-    f2 = glob.glob('/Users/chenwuji/Documents/RoadMatch/移动序列处理原始数据/szfDate/*')
+    f2 = glob.glob('/Users/chenwuji/Documents/RoadMatch/原始数据及变种/移动序列处理原始数据/szfDate/*')
     for file2 in f2:
         dataOneFile = []
         filename2 = os.path.basename(file2)
@@ -44,6 +45,4 @@ def writeToFile(fileName,data):
     f.close()
 
 if __name__ == '__main__':
-    s ='123456'
-    print s[0:5]
     readFile()

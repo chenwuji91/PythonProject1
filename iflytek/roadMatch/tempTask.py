@@ -2,6 +2,7 @@
 '''
 @author: chenwuji
 '''
+#文件的IO处理
 
 
 def writeToMapForm(lukouDict,outPath,dataList):
@@ -28,6 +29,6 @@ def writeToMapLuce(pathdate, outPath,dataList):
     s = pathdate + ':'
     for eachP in dataList:
         s = s + str(eachP) + ','
-    s = s + '\n'
+    s = s
     tools.writeToFile(outPath, s)
     print s
