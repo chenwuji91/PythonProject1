@@ -7,12 +7,12 @@
 '''
 import glob
 import os
-
-outputPath = '/Users/chenwuji/Documents/skypool/集群原始数据/歌手收听次数filled/'
+import tools
+outputPath = '/Users/chenwuji/Documents/skypool/集群原始数据/歌曲收听次数filled/'
 
 dateList = []
 def readRootPath():
-    f2 = glob.glob('/Users/chenwuji/Documents/skypool/集群原始数据/歌手收听次数/*')
+    f2 = glob.glob('/Users/chenwuji/Documents/skypool/集群原始数据/歌曲收听次数/*')
     for file2 in f2:
         readToBeFilled(file2)
 
@@ -64,5 +64,6 @@ def writeToFile(fileName,data):
 
 
 if __name__ == '__main__':
+    tools.makeDir(outputPath)
     genernateDateList()
     readRootPath()

@@ -8,7 +8,7 @@ outputPath = '/Users/chenwuji/Documents/skypool/集群原始数据/原始数据�
 
 
 def process():
-    f = open('/Users/chenwuji/Documents/skypool/mars_tianchi_user_actions.csv')
+    f = open('/Users/chenwuji/Documents/skypool/p2_mars_tianchi_user_actions.csv')
     for eachline in f:
         eachline = eachline.split('\n')[0]
         writeToFile(outputPath+eachline.split(',')[4], eachline)

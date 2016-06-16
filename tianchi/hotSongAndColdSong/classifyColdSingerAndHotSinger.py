@@ -8,6 +8,7 @@ import numpy as np
 import sys
 import glob
 import os
+import tools
 hotSong = []
 coldSong = []
 songListTimes = []
@@ -23,13 +24,13 @@ def readcold():
     f.close()
 
 def readhot():
-    f = open('/Users/chenwuji/Documents/skypool/HotSongAndColdSong/hotSong_97de6333157f35467dff271d7afb0a23')
+    f = open('/Users/chenwuji/Documents/skypool/hotSongList2.csv')
     for eachline in f:
         hotSong.append(str(eachline.split('\n')[0]))
     f.close()
 
 def readSong():
-    f = open('/Users/chenwuji/Documents/skypool/歌曲被收听次数.txt')
+    f = open('/Users/chenwuji/Documents/skypool/集群原始数据/歌曲收听次数.csv')
     for eachline in f:
         eachline = eachline.split('\n')[0]
         list1 = eachline.split(',')
@@ -38,7 +39,7 @@ def readSong():
     f.close()
 
 def readSingerSong():
-    f = open('/Users/chenwuji/Documents/skypool/mars_tianchi_songs.csv')
+    f = open('/Users/chenwuji/Documents/skypool/p2_mars_tianchi_songsWithSinger.csv')
     for eachline in f:
         list1 = eachline.split(',')
         song = str(list1[0])
@@ -52,6 +53,8 @@ def calculateSingerScore():
         songId = str(eachSongWithDate[0]).split(',')[0]
         date = str(eachSongWithDate[0]).split(',')[1]
         if songId in hotSong:
+            tools.makeDir('/Users/chenwuji/Documents/skypool/HotSongAndColdSong/')
+            tools.makeDir('/Users/chenwuji/Documents/skypool/HotSongAndColdSong/song/')
             writeToFile('/Users/chenwuji/Documents/skypool/HotSongAndColdSong/song/'+songId+'.csv', str(eachSongWithDate[1]) + ',' + date)
             # writeToFile('/Users/chenwuji/Documents/cwj.tianchi.forLocalTest/HotSongAndColdSong/歌曲收听人数.csv',
             #         songId+','+str(eachSongWithDate[1]) + ',' + date)
@@ -73,6 +76,8 @@ def calculateSingerScore():
     for eachSinger in singerScoreWithDate:
         singer = str(eachSinger).split(',')[0]
         date2 = str(eachSinger).split(',')[1]
+        tools.makeDir('/Users/chenwuji/Documents/skypool/HotSongAndColdSong/')
+        tools.makeDir('/Users/chenwuji/Documents/skypool/HotSongAndColdSong/singer/')
         writeToFile('/Users/chenwuji/Documents/skypool/HotSongAndColdSong/singer/' + singer +'.csv', str(singerScoreWithDate.get(eachSinger)) + ',' + date2)
 #上面的是批量输出  下面的是输出到单个文件
         # writeToFile('/Users/chenwuji/Documents/cwj.tianchi.forLocalTest/HotSongAndColdSong/歌手收听人数.csv', singer+','+str(singerScoreWithDate.get(eachSinger)) + ',' + date2)

@@ -4,9 +4,9 @@
 计算歌曲的收听次数
 '''
 
-dataIn = '/Users/chenwuji/Documents/skypool/集群原始数据/原始数据按天分文件/*'
-# outpath = '/Users/chenwuji/Documents/skypool/集群原始数据/HotAndCold歌曲收听次数/'
-outpath = '/Users/chenwuji/Documents/skypool/集群原始数据/'
+dataIn = '/Users/chenwuji/Documents/skypool/集群原始数据/原始数据按天/*'
+outpath = '/Users/chenwuji/Documents/skypool/集群原始数据/歌曲收听次数/'
+# outpath = '/Users/chenwuji/Documents/skypool/集群原始数据/'
 import glob
 import os
 
@@ -38,8 +38,8 @@ def process(filename):
         else:
             dict2.setdefault((song2, date2), 1)
     for eachRecord in dict2:
-        # writeToFile(outpath+eachRecord[0]+'.csv',str(dict2.get(eachRecord))+','+eachRecord[1])
-        writeToFile(outpath + '歌曲收听次数' + '.csv', eachRecord[0] + ',' + str(dict2.get(eachRecord)) + ',' + eachRecord[1])
+        writeToFile(outpath+eachRecord[0]+'.csv',str(dict2.get(eachRecord))+','+eachRecord[1])
+        # writeToFile(outpath + '歌曲收听次数' + '.csv', eachRecord[0] + ',' + str(dict2.get(eachRecord)) + ',' + eachRecord[1])
     f.close()
 
 def writeToFile(fileName,data):
@@ -50,6 +50,8 @@ def writeToFile(fileName,data):
 
 
 if __name__ == '__main__':
+    import tools
+    tools.makeDir(outpath)
 
     readTestList()
 

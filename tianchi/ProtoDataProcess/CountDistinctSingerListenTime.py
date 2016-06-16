@@ -12,7 +12,7 @@ import glob
 import os
 
 def readSingerSong():
-    f = open('/Users/chenwuji/Documents/skypool/mars_tianchi_songs_withSinger.csv')
+    f = open('/Users/chenwuji/Documents/skypool/p2_mars_tianchi_songsWithSinger.csv')
     for eachline in f:
         list1 = eachline.split(',')
         song = str(list1[0])
@@ -60,7 +60,8 @@ def writeToFile(fileName,data):
 
 
 if __name__ == '__main__':
-
+    import tools
+    tools.makeDir(outpath)
     readSingerSong()
     readTestList()
 

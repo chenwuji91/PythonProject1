@@ -11,7 +11,7 @@ hotSong = set()
 coldSong = set()
 
 def readSongList():
-    f = glob.glob('/Users/chenwuji/Documents/skypool/临时生成数据/收听人数/*')
+    f = glob.glob('/Users/chenwuji/Documents/skypool/集群原始数据/歌曲收听人数filled/*')
     for eachFile in f:
         fileBaseName = os.path.basename(eachFile).split('.')[0]
         f2 = open(eachFile)

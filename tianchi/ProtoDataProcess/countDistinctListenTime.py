@@ -4,10 +4,11 @@
 计算歌曲的收听人数
 '''
 
-dataIn = '/Users/chenwuji/Documents/skypool/集群原始数据/原始数据按天分文件/*'
-outpath = '/Users/chenwuji/Documents/skypool/集群原始数据/HotAndCold歌曲收听人数/'
+dataIn = '/Users/chenwuji/Documents/skypool/集群原始数据/原始数据按天/*'
+outpath = '/Users/chenwuji/Documents/skypool/集群原始数据/'
 import glob
 import os
+import tools
 
 def readTestList():
     f = glob.glob(dataIn)
@@ -49,6 +50,6 @@ def writeToFile(fileName,data):
 
 
 if __name__ == '__main__':
-
+    tools.makeDir(outpath)
     readTestList()
 

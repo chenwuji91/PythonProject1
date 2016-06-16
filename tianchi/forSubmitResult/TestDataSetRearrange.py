@@ -13,11 +13,11 @@ songToSinger = {}
 songScore = {}
 singerScore = {}
 singerAllScoreByDate ={}
-inpath = '/Users/chenwuji/Documents/skypool/测评相关/6-7-2/*'
-outpath = '/Users/chenwuji/Documents/skypool/测评相关/PredictResult0607-2.txt'
+inpath = '/Users/chenwuji/Documents/skypool/测评相关/6-14/*'
+outpath = '/Users/chenwuji/Documents/skypool/测评相关/PredictResult0614.txt'
 
 def readSingerSong():
-    f = open('/Users/chenwuji/Documents/skypool/mars_tianchi_songs_withSinger.csv')
+    f = open('/Users/chenwuji/Documents/skypool/p2_mars_tianchi_songsWithSinger.csv')
     for eachline in f:
         list1 = eachline.split(',')
         song = str(list1[0])
@@ -49,6 +49,7 @@ def calculateSingerScore():
             currentSinger = songToSinger.get(eachsong)  #找出这首歌对应的歌手
             currentScore = currentDaySingerScore.get(currentSinger)
             currentDaySingerScore.update({currentSinger:(currentScore + currentSongOfTheDayScore)})
+
         for singer in currentDaySingerScore:
             result = singer +','+ str(int(currentDaySingerScore.get(singer)))+','+str(dateList[eachday])
 
