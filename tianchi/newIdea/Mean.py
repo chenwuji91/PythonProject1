@@ -3,7 +3,7 @@
 @author: chenwuji
 '''
 
-dataIn = '/Users/chenwuji/Documents/skypool/新方法/SongListenTime/*'
+dataIn = '/Users/chenwuji/Documents/skypool/新方法/PublishDate/*'
 
 import numpy
 import glob
@@ -14,7 +14,7 @@ def getMean():
         num = []
         for eachLine in f1:
             eachLine = eachLine.split('\n')[0]
-            num.append(int(eachLine.split(',')[1]))
+            num.append(float(eachLine.split(',')[1]))
         print eachFile,
         print numpy.mean(num)
 

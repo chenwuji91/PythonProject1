@@ -4,20 +4,20 @@
 '''
 
 import tools
-
+import numpy
 dataIn = '/Users/chenwuji/Documents/skypool/集群原始数据/原始数据按天/'
 dataOut = '/Users/chenwuji/Documents/skypool/新方法/'
 userListPath = 'UserList/'
 songListenTime = 'SongListenTime/'
 songCount = 'SongCount/'
 singerCount = 'SingerCount/'
+publishDate = 'PublishDate/'
 tools.makeDir(dataOut)
 tools.makeDir(dataOut + userListPath)
-# tools.removeDir(dataOut + userListPath)
 tools.makeDir(dataOut + songListenTime)
 tools.makeDir(dataOut + songCount)
 tools.makeDir(dataOut + singerCount)
-# tools.removeDir(dataOut + songListenTime)
+tools.makeDir(dataOut + publishDate)
 date1 = ['20150501','20150430','20150429','20150428','20150427','20150426','20150425']
 date2 = ['20150531','20150530','20150529','20150528','20150527','20150526','20150525']
 date3 = ['20150324','20150323','20150329','20150328','20150327','20150326','20150325']
@@ -59,6 +59,7 @@ def process():
         for eachUser in dictUser:
             writeToFile(dataOut + songListenTime + eachP[0] + '-' +eachP[1], eachUser + ',' + str(dictUser.get(eachUser)))
 
+
         #获得歌曲的收听广度
         dictUser = {}
         songSet = set()
@@ -93,6 +94,23 @@ def process():
 
 
         #计算所听歌曲发型日期距离当前收听时间的天数
+        dictPublishDate = {}
+        songSet = set()
+        for song in songList:
+            songSet.add((song[0],song[1],song[2]))  #user song date
+        for eachS in songSet:
+            if dictPublishDate.__contains__(eachS[0]):
+                currentSongDate = dictPublishDate.get(eachS[0])
+                currentSongDate.append(int(tools.twoDateInterval(songDateDict.get(eachS[1]), song[2])))
+                dictPublishDate.setdefault(eachS[0], currentSongDate)
+            else:
+                currentSongDate = []
+                currentSongDate.append(int(tools.twoDateInterval(songDateDict.get(eachS[1]), song[2])))
+                dictPublishDate.setdefault(eachS[0], currentSongDate)
+        for eachUser in dictPublishDate:
+            writeToFile(dataOut + publishDate + eachP[0] + '-' + eachP[1],
+                        eachUser + ',' + str(numpy.mean(dictPublishDate.get(eachUser))))
+
 
 
 
