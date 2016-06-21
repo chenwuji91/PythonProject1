@@ -183,6 +183,7 @@ def roadMatch():  #需要做的是 输入连续的两个CarPoint类型点,且 ID
 
 
 def writeToFile(fileName,data):
+    tools.makeDir(rootpath+"/newMethod/")
     f = file(rootpath+"/newMethod/"+fileName, "a+")
     # f = file(rootpath + "/路段分时段车速信息/" + '20120301', "a+")
     f.writelines(data)
