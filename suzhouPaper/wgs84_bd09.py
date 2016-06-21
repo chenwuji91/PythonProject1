@@ -3,7 +3,7 @@ import json
 import requests
 import math
 
-key = 'your key here'  # 这里填写你的百度开放平台的key
+key = 'DO0QlmpG9W8WGlzMkOe5EI4W'  # 这里填写你的百度开放平台的key
 x_pi = 3.14159265358979324 * 3000.0 / 180.0
 pi = 3.1415926535897932384626  # π
 a = 6378245.0  # 长半轴
@@ -154,9 +154,10 @@ def out_of_china(lng, lat):
 if __name__ == '__main__':
     lng = 128.543
     lat = 37.065
-    result1 = gcj02tobd09(lng, lat)
-    result2 = bd09togcj02(lng, lat)
-    result3 = wgs84togcj02(lng, lat)
-    result4 = gcj02towgs84(lng, lat)
-    result5 = geocode('北京市朝阳区朝阳公园')
-    print result1, result2, result3, result4, result5
+    # result1 = gcj02tobd09(120.87119021890862, 31.255232357594856)
+    result2 = bd09togcj02(120.86701,31.257409)
+    # result3 = wgs84togcj02(120.86701, 31.257409)
+    result4 = gcj02towgs84(result2[0], result2[1])
+    # result5 = geocode('北京市朝阳区朝阳公园')
+    # print result1, result2, result3, result4, result5
+    print result4

@@ -10,6 +10,7 @@ import glob
 import os
 from datetime import datetime
 import tools
+import uuid
 lukouDict = {}
 roadAdjDict = {}
 carDataDict = []
@@ -46,10 +47,16 @@ def readAdj():
             roadAdjDict.setdefault(list1[0],list2)
         f.close()
 def readCar(pathToRead):
+    zuoshangjiao = 120.6354828592534, 31.376368052001823
+    zuoxiajiao = 120.63549057996597, 31.253756666173818
+    youshangjiao = 120.85634919819948, 31.376015656647887
+    youxiajiao = 120.85635657413037, 31.253404335545934
     f = open(pathToRead)
     for eachline in f:
         list1 = eachline.split(',')
-        if(list1.__len__()>5):
+        if(list1.__len__()>5) and float(list1[1]) > zuoshangjiao[0] \
+                and float(list1[1]) < youxiajiao[0] and float(list1[2]) < zuoshangjiao[1] \
+                and float(list1[2]) > youxiajiao[1]:
             carDataDict.append(CarPoint(list1[0],float(list1[1]),float(list1[2]),int(list1[3]),int(list1[4]),list1[5]))
     f.close()
 
@@ -110,7 +117,8 @@ def roadMatch():  #需要做的是 输入连续的两个CarPoint类型点,且 ID
             if currentTotalTime == 0:
                 currentTotalTime = currentTotalTime + 0.000001
             currentSpeed = float(currentTotalDis)/float(currentTotalTime) * 3.6
-            speedInfoList.append((currentBeforeLukou,nextBeforLukou))
+            speedInfoList.append((currentBeforeLukou,nextBeforLukou,calculate(lukouDict.get(currentBeforeLukou).x,lukouDict.get(currentBeforeLukou).y,
+                                                                              lukouDict.get(nextBeforLukou).x,lukouDict.get(nextBeforLukou).y)))
         else:
             for j in range(len(nextLukou)-1):
                 currentTotalDis = currentTotalDis + calculate(lukouDict.get(nextLukou[j]).x,lukouDict.get(nextLukou[j]).y,
@@ -128,7 +136,8 @@ def roadMatch():  #需要做的是 输入连续的两个CarPoint类型点,且 ID
                 # count1 = count1 + 1
             speedInfoList.append((currentBeforeLukou,nextLukou[0],dis00))
             for j in range(len(nextLukou) - 1):
-                speedInfoList.append((nextLukou[j],nextLukou[j+1]))
+                speedInfoList.append((nextLukou[j],nextLukou[j+1],calculate(lukouDict.get(nextLukou[j]).x,lukouDict.get(nextLukou[j]).y,
+                                                                            lukouDict.get(nextLukou[j+1]).x,lukouDict.get(nextLukou[j+1]).y)))
             speedInfoList.append((nextLukou[len(nextLukou)-1],nextNextLukou,disnn))
         pointPairInfo.append((speedInfoList,currentSpeed,dddInfo1,dddInfo2,allHouxuanPoint[i][0].speed,
                               currentTotalDis,calculate(allHouxuanPoint[i+1][0].x,allHouxuanPoint[i+1][0].y,
@@ -168,7 +177,9 @@ def roadMatch():  #需要做的是 输入连续的两个CarPoint类型点,且 ID
             dateWrite = str(pointPairInfo[i][0][j][0]) + ';' + str(pointPairInfo[i][0][j][1]) + ';' + str(pointPairInfo[i][1]) + ';' \
                         + str(pointPairInfo[i][2]) + ';' + str(pointPairInfo[i][3]) + ';' + str(pointPairInfo[i][4])
             writeToFile(filename, dateWrite)
-
+    pName = uuid.uuid1()
+    tools.makeDir(rootpath+"/newMethod/obj/")
+    tools.toFileWithPickle(rootpath+"/newMethod/obj/"+ str(pName), pointPairInfo)
 
 
 def writeToFile(fileName,data):
@@ -286,7 +297,7 @@ def generateHouxuanLuduan(point, nearbyPointSet):  # 原始点   点周围的临
     # print listHouxuan[0].roadIntersection2
     # print len(listHouxuan)
     if len(listHouxuan) < 1:
-        print 'null'
+        # print 'null'
         return
     else:
         return listHouxuan[0]
@@ -311,10 +322,14 @@ if __name__ == '__main__':
         oneDay = dir+filename1+'/'
         f2 = glob.glob(oneDay + '//*')
         for file2 in f2:
-            filename2 = os.path.basename(file2)
-            print '当前正在处理文件:'+oneDay+filename2
-            carDataDict = []
-            readCar(oneDay+filename2)
-            # printEouLaDis()
-            # pass
-            roadMatch()
+            try:
+                filename2 = os.path.basename(file2)
+                print '当前正在处理文件:'+oneDay+filename2
+                carDataDict = []
+                readCar(oneDay+filename2)
+                # printEouLaDis()
+                # pass
+                roadMatch()
+            except:
+                print 'Fail File:',
+                print oneDay + filename2

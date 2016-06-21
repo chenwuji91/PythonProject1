@@ -57,6 +57,12 @@ def calculate(lon1, lat1, lon2, lat2): # 经度1，纬度1，经度2，纬度2 �
     r = 6371 # 地球平均半径，单位为公里
     return c * r * 1000
 
+import pickle as p
+def toFileWithPickle(filename, obj1):
+    f = file(filename + '.data', "w")
+    p.dump(obj1,f)
+    f.close()
+
 if __name__ == '__main__':
     print intervalofSeconds('2015-02-03 08:19:01','2015-02-04 18:09:09')#96
     print calculate(120.698959,31.3425903,120.693153,31.330349)
