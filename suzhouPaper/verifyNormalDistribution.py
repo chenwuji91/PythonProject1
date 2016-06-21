@@ -8,12 +8,12 @@
 
 #读取文件的时候  先读取suzhou1——10的列表  然后在另外一个目录下做正则匹配 读取相关的所有文件  一个路口存到一个集合中进行操作
 #操作包括周末的判断 时间段元组的划分 等
-
+import tools
 path1 = '/Users/chenwuji/Documents/苏州出租车/原始数据和中间结果/完整的速度信息数据/suzhou1-10/result/'
 path2 = '/Users/chenwuji/Documents/苏州出租车/原始数据和中间结果/完整的速度信息数据/路段分时段车速信息/'
-outputPathSingleRsult = '/Users/chenwuji/Documents/苏州出租车/NormalDisResult/'
+outputPathSingleRsult = '/Users/chenwuji/Documents/苏州出租车/NormalDisResult2/'
 outpathResultDate = '/Users/chenwuji/Documents/苏州出租车/NormalDisRsultByDate/'
-
+tools.makeDir(outpathResultDate)
 
 fileList = []
 
@@ -50,19 +50,20 @@ def dataFilter(oneFileDataList):
         basicInfo = list[0]
         currentPri = int(basicInfo.split(',')[0])  #当前路的前一个点
         currentLater = int(basicInfo.split(',')[1])  #当前路的后一个点
-        nextPri = int(basicInfo.split(',')[2])   #当前路的下一个点
-        roadDetailInfo = list[3]
-        otherRoadIntersection = roadDetailInfo.split('[')[1].split(']')[0].split(',')
-        if len(otherRoadIntersection)>0:
-            for eachPointIndex in range(1,len(otherRoadIntersection)):
-                nextPri = int(otherRoadIntersection[eachPointIndex].split('\'')[1])
-                if nextPri != currentPri and nextPri != currentLater:
-                    break
+        # nextPri = int(basicInfo.split(',')[2])   #当前路的下一个点
+        # roadDetailInfo = list[3]
+        # otherRoadIntersection = roadDetailInfo.split('[')[1].split(']')[0].split(',')
+        # if len(otherRoadIntersection)>0:
+        #     for eachPointIndex in range(1,len(otherRoadIntersection)):
+        #         nextPri = int(otherRoadIntersection[eachPointIndex].split('\'')[1])
+        #         if nextPri != currentPri and nextPri != currentLater:
+        #             break
         timeInfo = tools.timeTranslate(list[2].split(',')[1])
         speed = int(list[1])
         ifweekend = tools.getDay(list[2].split(',')[1])
-        if nextPri != currentLater and nextPri != currentPri and speed > 5:
-            basicInfo = (currentPri, currentLater, nextPri, timeInfo, ifweekend)
+        # if nextPri != currentLater and nextPri != currentPri and speed > 5:
+        if speed > 5:
+            basicInfo = (currentPri, currentLater, timeInfo, ifweekend)
             if currentRoadDict.__contains__(basicInfo):
                 speedList = currentRoadDict.get(basicInfo)
                 speedList.append(speed)
@@ -74,7 +75,7 @@ def dataFilter(oneFileDataList):
     speedDictAC = {}
     for eachD in currentRoadDict:
         l = currentRoadDict.get(eachD)
-        if len(l) > 25:
+        if len(l) > 6:
             speedDictAC.setdefault(eachD, l)
     return speedDictAC
 
@@ -88,21 +89,28 @@ def KSTest(dataDict):
         floorList = listMean * 0.5
         ceilList = listMean * 1.5
         x = []
+        x1 = []
         for eachE in eachPointList:
-            if eachE > floorList and eachE < ceilList:
+            # if eachE > floorList and eachE < ceilList:
                 x.append((eachE - listMean) / liststd)
+                x1.append(eachE)
         test_stat = kstest(x, 'norm')
-        tools.writeToFile(outputPathSingleRsult + str(eachRecord[0]) + '_' + str(eachRecord[1]) + '_' + str(eachRecord[4]), str(eachRecord) + ':' + str(test_stat))
-        tools.writeToFile(outpathResultDate + str(eachRecord[3]) +'_'+ str(eachRecord[4]) +'.csv' ,str(test_stat[1])+ ',' + str(eachRecord[0]) + ',' + str(eachRecord[1]) + ',' + str(eachRecord[2]))
+        tools.makeDir(outputPathSingleRsult)
+        tools.writeToFile(outputPathSingleRsult + str(eachRecord[0]) + '_' + str(eachRecord[1]) + '_' +str(eachRecord[3]),
+                          str(eachRecord) + ':' + str(test_stat)+';' + str(x1) +';'+ str(listMean) + ';' + str(liststd))
+        tools.writeToFile(outpathResultDate + str(eachRecord[2]) +'_'+ str(eachRecord[3]) +'.csv' ,str(test_stat[1])+ ',' + str(eachRecord[0]) + ',' + str(eachRecord[1]) + ',' +str(listMean) + ',' + str(liststd))
 
 
 if __name__ =='__main__':
     fileListAll()
     print len(fileList)
     for eachFile in fileList:
-        dataList = readData(eachFile)
-        dataDict = dataFilter(dataList)
-        KSTest(dataDict)
+        try:
+            dataList = readData(eachFile)
+            dataDict = dataFilter(dataList)
+            KSTest(dataDict)
+        except:
+            continue
 
     # x = np.random.normal(23,3,1000)
     # x = x * 1000

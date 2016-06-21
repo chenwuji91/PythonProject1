@@ -9,6 +9,7 @@ import networkx as nx
 import glob
 import os
 from datetime import datetime
+import tools
 lukouDict = {}
 roadAdjDict = {}
 carDataDict = []
@@ -86,29 +87,93 @@ def nearestPath(point1,point2, G):
 
 
 def roadMatch():  #需要做的是 输入连续的两个CarPoint类型点,且 ID一致    输出一个道路上面的道路行驶情况的集合  [(当前路段,下一路段),车辆ID,时间段,速度]
+    # count1 = 0
     G = graphGenerate()
-    allHouxuanPoint = houxuanPoint()
+    allHouxuanPoint = houxuanPoint()  #就是一个文件的全部点集
+    # print nearestPath('26','328',G)
+    pointPairInfo = []
     for i in range(len(allHouxuanPoint)-1):
         currentBeforeLukou = allHouxuanPoint[i][1].roadIntersection1  # 当前路口的上一个路口
         currentNextLukou = allHouxuanPoint[i][1].roadIntersection2 #当前路口的下一个路口
-        nextBeforLukou = allHouxuanPoint[i+1][1].roadIntersection1  #下一个点的上一次路口
-        nextLukou = nearestPath(currentNextLukou,nextBeforLukou,G)
-        dddInfo = str(allHouxuanPoint[i][0].time)
-        temp = nextLukou[0]
-        if len(nextLukou) > 1:
-            temp = nextLukou[1]
+        nextBeforLukou = allHouxuanPoint[i+1][1].roadIntersection1  #下一个点的上一次路口   这个距离实际上是包含方向的 因为带有方向角 所以这个总是从一端到另外一端
+        nextNextLukou = allHouxuanPoint[i + 1][1].roadIntersection2
+        nextLukou = nearestPath(currentNextLukou,nextBeforLukou,G)  #保存的是中间的所有的路径
+        dddInfo1 = str(allHouxuanPoint[i][0].time)
+        dddInfo2 = str(allHouxuanPoint[i+1][0].time)
+        currentTotalDis = 0
+        currentTotalTime = 0
+        currentSpeed = 0
+        speedInfoList = []
+        if currentBeforeLukou == nextBeforLukou and currentNextLukou == nextNextLukou:
+            currentTotalDis = calculate(allHouxuanPoint[i][1].x, allHouxuanPoint[i][1].y, allHouxuanPoint[i+1][1].x, allHouxuanPoint[i+1][1].y)
+            currentTotalTime = tools.intervalofSeconds(dddInfo1,dddInfo2)
+            if currentTotalTime == 0:
+                currentTotalTime = currentTotalTime + 0.000001
+            currentSpeed = float(currentTotalDis)/float(currentTotalTime) * 3.6
+            speedInfoList.append((currentBeforeLukou,nextBeforLukou))
         else:
-            temp = nextLukou[0]
-        ddd = datetime.strptime(dddInfo, "%Y-%m-%d %H:%M:%S").hour
-        fileName = str(currentBeforeLukou)+'_'+ str(currentNextLukou)+'_'+str(temp)+'_'+str(ddd)
-        dataWrite = str(currentBeforeLukou)+','+ str(currentNextLukou)+','+str(temp) +','+str(ddd) + ';' +str(allHouxuanPoint[i][0].speed)+ ';'+ str(allHouxuanPoint[i][0].carId) +','+ str(allHouxuanPoint[i][0].time)+";"+str(nextLukou)
-        # print fileName
-        # print dataWrite
-        writeToFile(fileName,dataWrite)
+            for j in range(len(nextLukou)-1):
+                currentTotalDis = currentTotalDis + calculate(lukouDict.get(nextLukou[j]).x,lukouDict.get(nextLukou[j]).y,
+                                            lukouDict.get(nextLukou[j+1]).x,lukouDict.get(nextLukou[j+1]).y)
+            dis00 = calculate(allHouxuanPoint[i][1].x,allHouxuanPoint[i][1].y,
+                                                          lukouDict.get(nextLukou[0]).x, lukouDict.get(nextLukou[0]).y)
+            currentTotalDis = currentTotalDis + dis00
+            disnn = calculate(allHouxuanPoint[i+1][1].x,allHouxuanPoint[i+1][1].y,
+                                                          lukouDict.get(nextLukou[len(nextLukou)-1]).x, lukouDict.get(nextLukou[len(nextLukou)-1]).y)
+            currentTotalDis = currentTotalDis + disnn
+            currentTotalTime = tools.intervalofSeconds(dddInfo1,dddInfo2)
+            currentSpeed = float(currentTotalDis)/float(currentTotalTime) * 3.6
+            # if currentSpeed > 100.0:
+                # print '+++++++++++++++++'
+                # count1 = count1 + 1
+            speedInfoList.append((currentBeforeLukou,nextLukou[0],dis00))
+            for j in range(len(nextLukou) - 1):
+                speedInfoList.append((nextLukou[j],nextLukou[j+1]))
+            speedInfoList.append((nextLukou[len(nextLukou)-1],nextNextLukou,disnn))
+        pointPairInfo.append((speedInfoList,currentSpeed,dddInfo1,dddInfo2,allHouxuanPoint[i][0].speed,
+                              currentTotalDis,calculate(allHouxuanPoint[i+1][0].x,allHouxuanPoint[i+1][0].y,
+                                                        allHouxuanPoint[i ][0].x,allHouxuanPoint[i][0].y)))
+        # temp = nextLukou[0]
+        # if len(nextLukou) > 1:
+        #     temp = nextLukou[1]
+        # else:
+        #     temp = nextLukou[0]
+        # ddd = datetime.strptime(dddInfo1, "%Y-%m-%d %H:%M:%S").hour
+    # fileName = str(currentBeforeLukou)+'_'+ str(currentNextLukou)+'_'+str(temp)+'_'+str(ddd)
+    # dataWrite = str(currentBeforeLukou)+','+ str(currentNextLukou)+','+str(temp) +','+str(ddd) + ';' +str(allHouxuanPoint[i][0].speed)+ ';'+ str(allHouxuanPoint[i][0].carId) +','+ str(allHouxuanPoint[i][0].time)+";"+str(nextLukou)
+    # # print fileName
+    # # print dataWrite
+    # writeToFile(fileName,dataWrite)
+    # print 'co!'
+    # print count1
+    for oneSpeed in pointPairInfo[0][0]:
+        filename = str(oneSpeed[0]) + '_' + str(oneSpeed[1])
+        dateWrite = str(oneSpeed[0]) + ';' + str(oneSpeed[1]) + ';' + str(pointPairInfo[0][1]) + ';' \
+                    + str(pointPairInfo[0][2]) +';'+ str(pointPairInfo[0][3]) + ';' + str(pointPairInfo[0][4])
+        writeToFile(filename,dateWrite)
+
+    for i in range(1,len(pointPairInfo)-1):
+        filename = str(pointPairInfo[i][0][0][0]) + '_' + str(pointPairInfo[i][0][0][1])
+        try:
+            speed = (pointPairInfo[i-1][0][len(pointPairInfo[i-1][0])-1][2] + pointPairInfo[i][0][0][2])/\
+                    (pointPairInfo[i-1][0][len(pointPairInfo[i-1][0])-1][2]/pointPairInfo[i-1][1] +
+                     pointPairInfo[i][0][0][2]/pointPairInfo[i][1])
+        except:
+            speed = str(pointPairInfo[i][1])
+        dateWrite = str(pointPairInfo[i][0][0][0]) + ';' + str(pointPairInfo[i][0][0][1]) + ';' + str(speed) + ';' \
+                    + str(pointPairInfo[i][2]) + ';' + str(pointPairInfo[i][3]) + ';' + str(pointPairInfo[i][4])
+        writeToFile(filename, dateWrite)
+        for j in range(1,len(pointPairInfo[i][0])-1):
+            filename = str(pointPairInfo[i][0][j][0]) + '_' + str(pointPairInfo[i][0][j][1])
+            dateWrite = str(pointPairInfo[i][0][j][0]) + ';' + str(pointPairInfo[i][0][j][1]) + ';' + str(pointPairInfo[i][1]) + ';' \
+                        + str(pointPairInfo[i][2]) + ';' + str(pointPairInfo[i][3]) + ';' + str(pointPairInfo[i][4])
+            writeToFile(filename, dateWrite)
+
+
 
 def writeToFile(fileName,data):
-    # f = file(rootpath+"/路段分时段车速信息/"+fileName, "a+")
-    f = file(rootpath + "/路段分时段车速信息/" + '20120301', "a+")
+    f = file(rootpath+"/newMethod/"+fileName, "a+")
+    # f = file(rootpath + "/路段分时段车速信息/" + '20120301', "a+")
     f.writelines(data)
     f.writelines("\n")
     f.close()
@@ -121,12 +186,13 @@ def houxuanPoint():  # 寻找附近的点  讲当前基站的路口点按照距�
                 currentLukouPoint = lukouDict.get(roadIntersection)  # RoadIntersection是当前路口的ID号  得到的是当前ID对应的经纬度
                 currentDis = calculate(float(eachCell.x), float(eachCell.y), float(currentLukouPoint.x),
                                        float(currentLukouPoint.y))  # 得到的是当前路口离当前基站的距离
-                if (currentDis < 3000):  # 只找周围5KM的路口
+                if (currentDis < 500):  # 只找周围5KM的路口
                     # listCurrentCell.setdefault(roadIntersection,int(currentDis))#当前路口点和当前基站的距离加入字典集合
                     nearByPointSet.add(roadIntersection)  # 找到所有小于3km的点 放到集合里面去   15:40测试的没有问题
             # print nearByPointSet
             HouxuanP = generateHouxuanLuduan(eachCell, nearByPointSet)  # 返回值HouxuanPoint  保存的是当前GPS点对应的道路点的信息  class为 CarPoint
-            allHouxuanPoint.append((eachCell,HouxuanP))
+            if HouxuanP:
+                allHouxuanPoint.append((eachCell,HouxuanP))
         return allHouxuanPoint
 
 #返回的数据类型  返回一个点 即intersection1表示上一个路段  intersection2表示下一个路段 xy表示当前具体在道路上面点的位置,这个仅供参考即可
@@ -138,7 +204,7 @@ class HouxuanPoint:
         self.roadIntersection2 = roadIntersection2
         self.dis = dis  #这里表示距离和角度的相似度
         self.angle = angle
-        self.sim = dis*angle+dis+angle
+        self.sim = dis  #*angle+dis+angle
     def __cmp__(self, other):
         if self.sim > other.sim:
             return 1
@@ -208,7 +274,8 @@ def generateHouxuanLuduan(point, nearbyPointSet):  # 原始点   点周围的临
             angleSimilarity = np.abs((float(point.angle)-temp1))
             distance0n = calculate(x0, y0, x_intersect, y_intersect)  #实际GPS点到当前道路的距离
             # if angleSimilarity < 60 and distance0n < 2000:
-            listHouxuan.append(HouxuanPoint(x_intersect,y_intersect,eachRoadIntersectionPoint,point2_2_2,angleSimilarity,distance0n))
+            if angleSimilarity < 60:
+                listHouxuan.append(HouxuanPoint(x_intersect,y_intersect,eachRoadIntersectionPoint,point2_2_2,angleSimilarity,distance0n))
 
     listHouxuan.sort()
     # print '最好的相似度'
@@ -217,15 +284,25 @@ def generateHouxuanLuduan(point, nearbyPointSet):  # 原始点   点周围的临
     # print listHouxuan[0].sim
     # print '下一个路口'
     # print listHouxuan[0].roadIntersection2
-    return listHouxuan[0]
+    # print len(listHouxuan)
+    if len(listHouxuan) < 1:
+        print 'null'
+        return
+    else:
+        return listHouxuan[0]
     # return listHouxuan
+
+
+def printEouLaDis():
+    for i in range(1,len(carDataDict)-1):
+        print calculate(carDataDict[i-1].x,carDataDict[i-1].y,carDataDict[i].x,carDataDict[i].y)
 
 
 
 if __name__ == '__main__':
     readLukou()
     readAdj()
-    dir = rootpath+'原始数据/workday/'  # 要访问文件夹路径
+    dir = rootpath+'原始数据和中间结果/20120301-20120310_navigate/'  # 要访问文件夹路径
     fffff = glob.glob(dir + '//*')
     print 'begin'
     for file1 in fffff:
@@ -238,43 +315,6 @@ if __name__ == '__main__':
             print '当前正在处理文件:'+oneDay+filename2
             carDataDict = []
             readCar(oneDay+filename2)
+            # printEouLaDis()
+            # pass
             roadMatch()
-        # f = open(dir + '//' + filename, 'r')
-        # f.close()
-
-    # carDataDict = []
-    # readCar()
-    # roadMatch()
-     # houxuanPoint()
-     # x2 = 116.3526
-     # y2 = 39.84
-     # x1 = 116.5929
-     # y1 = 39.9442
-     # x2 = 116.281323
-     # y2 = 39.971201
-     # x1 = 116.686639
-     # y1 = 39.891086
-     # k1 = (y2-y1)/(x2-x1)
-     # # k1 = 1.0/2.0
-     # # print np.arctanh(k1)/np.pi*180
-     # # print np.arctan(1.0/k1)/np.pi*180
-     # temp1 = np.arctan(k1)/np.pi*180
-     # if y2>y1:
-     #     if temp1>0:
-     #         temp1 = 90 - temp1
-     #     else:
-     #         temp1 = 360 - (90 + temp1)
-     # else:
-     #     if temp1<0:
-     #         temp1 = 90 - temp1
-     #     else:
-     #         temp1 = 180 + (90-temp1)
-     #
-     # print temp1
-
-     # print np.arctan(k1)/np.pi*180
-
-
-        
-
-        

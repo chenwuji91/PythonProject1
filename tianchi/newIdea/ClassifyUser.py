@@ -5,6 +5,7 @@
 
 import tools
 import numpy
+import copy
 dataIn = '/Users/chenwuji/Documents/skypool/集群原始数据/原始数据按天/'
 dataOut = '/Users/chenwuji/Documents/skypool/新方法/'
 userListPath = 'UserList/'
@@ -23,11 +24,14 @@ date2 = ['20150531','20150530','20150529','20150528','20150527','20150526','2015
 date3 = ['20150324','20150323','20150329','20150328','20150327','20150326','20150325']
 date4 = ['20150314','20150313','20150312','20150311','20150310','20150309','20150308']
 date5 = ['20150506','20150505','20150504','20150503','20150502','20150501','20150430']
+date6 = ['20150725','20150726','20150727','20150728','20150729','20150731','20150730']
 point = [('40d549e1310ae3ac82c318db775a7cce', '20150502', date1),
          ('40d549e1310ae3ac82c318db775a7cce', '20150601', date2),
          ('bcff0374e8fd6ece0a5d3658e41b9634', '20150330', date3),
          ('8a27d9a6c59628c991c154e8d93f412e', '20150315', date4),
-         ('0827a03c7ff7175d7d284b4aa1966d5d' ,'20150507', date5)]
+         ('0827a03c7ff7175d7d284b4aa1966d5d' ,'20150507', date5),
+         ('8a27d9a6c59628c991c154e8d93f412e' , '20150801',date6),
+         ('40d549e1310ae3ac82c318db775a7cce' , '20150801',date6)]
 songToSinger = {}
 songDateDict = {}
 
@@ -43,11 +47,13 @@ def process():
         # 开始看每个用户在这里面
 
 
-
+        userSetBaseDict = {}
+        for eachU in userSet:
+            userSetBaseDict.setdefault(eachU,0)
         songList = getSong(eachP[2], userList)  #得到跟这些用户和这些日期相关的听歌事务数据
 
         # 获得某一部分用户群  的所有歌曲的收听次数
-        dictUser = {}
+        dictUser = copy.deepcopy(userSetBaseDict)
         for eachS in songList:
             if dictUser.__contains__(eachS[0]):
                 currentCount = dictUser.get(eachS[0])
@@ -61,7 +67,7 @@ def process():
 
 
         #获得歌曲的收听广度
-        dictUser = {}
+        dictUser = copy.deepcopy(userSetBaseDict)
         songSet = set()
         for song in songList:
             songSet.add((song[0],song[1]))
@@ -77,7 +83,7 @@ def process():
                         eachUser + ',' + str(dictUser.get(eachUser)))
 
         #获得歌手的收听广度
-        dictUser = {}
+        dictUser = copy.deepcopy(userSetBaseDict)
         songSet = set()
         for song in songList:
             songSet.add((song[0],songToSinger.get(song[1])))
