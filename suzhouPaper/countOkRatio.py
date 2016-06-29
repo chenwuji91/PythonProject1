@@ -2,8 +2,11 @@
 '''
 @author: chenwuji
 '''
-inPath = '/Users/chenwuji/Documents/苏州出租车/NormalDisRsultByDate/'
-outPath = '/Users/chenwuji/Documents/苏州出租车/'
+
+tobeChecked = '按照瞬时速度检验标准正态的时间结果'
+
+inPath = '/Users/chenwuji/Documents/苏州出租车/'+tobeChecked+'/按照日期的检验平均速度/'
+outPath = '/Users/chenwuji/Documents/苏州出租车/'+tobeChecked+'/'
 import glob
 import tools
 import os
