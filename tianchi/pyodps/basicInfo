@@ -1,0 +1,11 @@
+insert into table mars_user_listen_others SELECT
+'2dc8d3a917b12e65d4695e2277dd4943'
+,mars_user_actions_singer.ds,count(mars_user_actions_singer.user_id) FROM (SELECT user_id FROM mars_user_actions_singer WHERE ds =
+20150310
+ AND artist_id =
+'2dc8d3a917b12e65d4695e2277dd4943'
+ AND action_type = 1) a JOIN mars_user_actions_singer on mars_user_actions_singer.ds =
+20150310
+ AND mars_user_actions_singer.artist_id !=
+'2dc8d3a917b12e65d4695e2277dd4943'
+ AND mars_user_actions_singer.action_type = 1 AND mars_user_actions_singer.user_id = a.user_id group by mars_user_actions_singer.ds;

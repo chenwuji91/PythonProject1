@@ -65,5 +65,17 @@ def toFileWithPickle(filename, obj1):
 
 if __name__ == '__main__':
     print intervalofSeconds('2015-02-03 08:19:01','2015-02-04 18:09:09')#96
-    print calculate(120.698959,31.3425903,120.693153,31.330349)
+
+
+    zuoshangjiao = 120.6354828592534, 31.376368052001823
+    zuoxiajiao = 120.63549057996597, 31.253756666173818
+    youshangjiao = 120.85634919819948, 31.376015656647887
+    youxiajiao = 120.85635657413037, 31.253404335545934
+
+    print calculate(zuoshangjiao[0], zuoshangjiao[1], youshangjiao[0], youshangjiao[1])
+    print calculate(zuoxiajiao[0], zuoxiajiao[1], youxiajiao[0], youxiajiao[1])
+    print calculate(zuoxiajiao[0],zuoxiajiao[1],zuoshangjiao[0],zuoshangjiao[1])
+    print calculate(youshangjiao[0],youshangjiao[1],youxiajiao[0],youxiajiao[1])
+    print 13633*20995
+    # print
 

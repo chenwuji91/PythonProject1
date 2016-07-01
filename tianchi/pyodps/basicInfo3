@@ -1,0 +1,3 @@
+insert into table mars_tianchi_artist_plays_predict select artist_id,ceil(avg(_c2)),
+20160901
+from singer_listen_times  where ds > 20150810 and ds < 20150901 group by artist_id;
