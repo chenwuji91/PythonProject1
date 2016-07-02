@@ -41,7 +41,7 @@ def readLukou():
 
 
 def readAdj():
-    f = open(rootpath + '道路等相关数据/roadnet_newid.txt')
+    f = open(rootpath + '道路等相关数据/roadnet_newid')
     for eachline in f:
         list1 = eachline.split(':')
         list2 = list1[1].split()
