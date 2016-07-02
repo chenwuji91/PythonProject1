@@ -13,6 +13,7 @@ def timeTranslate(date):
     return timeSplit
 
 def timeRetranslate(time):
+    time = int(time)
     hour = int(time/10)
     minute = int(time%10) * 6
     return str(hour) + ':' + str(minute)

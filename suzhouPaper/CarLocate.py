@@ -272,7 +272,7 @@ def generateHouxuanLuduan(point, nearbyPointSet):  # 原始点   点周围的临
             x_intersect = (b0 - b1) / (k1 - k0)  # 点和垂线的交点的坐标
             y_intersect = k0 * x_intersect + b0
 
-            判断越界
+            if x_intersect
 
             # print x_intersect
             temp1 = np.arctan(k1) / np.pi * 180
