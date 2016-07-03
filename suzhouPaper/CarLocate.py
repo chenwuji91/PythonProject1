@@ -91,6 +91,8 @@ def graphGenerate():
             G.add_edge(eachPointPair,anotherPoint,weight = dis)
     print "有向带权图加载完成"
     return G
+
+
 def nearestPath(point1,point2, G):
     try:
         return nx.dijkstra_path(G, point1 , point2)

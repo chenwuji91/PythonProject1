@@ -48,5 +48,18 @@ if __name__ == '__main__':
     print rd.getRoadTimeAvg('1016','895',str(tools.timeTranslate('2012-03-02 09:58:23')),1)  #传入的参数需要转换为时间段
     print tools.timeRetranslate('74')
 
+    import networkx as nx
+    #demo of networkx
+    def graphGenerate():
+        G = nx.DiGraph()
+        G.add_edge('291', '214', weight = 21)
+        return G
+
+    def nearestPath(point1, point2, G):
+        try:
+            return nx.dijkstra_path(G, point1, point2)
+        except:
+            return [point1, point2]
+
 
 
