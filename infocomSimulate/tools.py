@@ -2,6 +2,7 @@
 #-*- coding: UTF-8 -*-
 '''
 @author: chenwuji
+常用工具类
 '''
 
 #时间处理的相关工具

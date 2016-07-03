@@ -14,7 +14,12 @@ import uuid
 lukouDict = {}
 roadAdjDict = {}
 carDataDict = []
-rootpath = '/Users/chenwuji/Documents/苏州出租车/'
+current_date1 = ''
+current_car = ''
+
+import os
+sep = os.sep
+rootpath = sep+ 'Users'+sep+'chenwuji'+sep+'Documents'+sep+'苏州出租车'+sep+''
 
 
 class RoadIntersectionPoint:
@@ -31,7 +36,7 @@ class CarPoint:
         self.speed = speed
         self.time = time
 def readLukou():
-        f =open(rootpath+'道路等相关数据/intersection_newid.txt')
+        f =open(rootpath+'道路等相关数据'+sep+'intersection_newid.txt')
         for eachline in f:
             list1 = eachline.split(',')
             lukouId = list1[0]
@@ -40,7 +45,7 @@ def readLukou():
             lukouDict.setdefault(lukouId,RoadIntersectionPoint(float(position1),float(position2)))
         f.close()
 def readAdj():
-        f =open(rootpath+'道路等相关数据/roadnet_newid.txt')
+        f =open(rootpath+'道路等相关数据'+sep+'roadnet_newid.txt')
         for eachline in f:
             list1 = eachline.split(':')
             list2 = list1[1].split()
@@ -177,14 +182,14 @@ def roadMatch():  #需要做的是 输入连续的两个CarPoint类型点,且 ID
             dateWrite = str(pointPairInfo[i][0][j][0]) + ';' + str(pointPairInfo[i][0][j][1]) + ';' + str(pointPairInfo[i][1]) + ';' \
                         + str(pointPairInfo[i][2]) + ';' + str(pointPairInfo[i][3]) + ';' + str(pointPairInfo[i][4])
             writeToFile(filename, dateWrite)
-    pName = uuid.uuid1()
-    tools.makeDir(rootpath+"/newMethod/obj/")
-    tools.toFileWithPickle(rootpath+"/newMethod/obj/"+ str(pName), pointPairInfo)
+    pName = str(current_date1) +'_'+str(current_car)+'_'+str(uuid.uuid1())
+    tools.makeDir(rootpath+sep+'newMethod'+sep+'obj'+sep+'')
+    tools.toFileWithPickle(rootpath+''+sep+'newMethod'+sep+'obj'+sep+''+ str(pName), pointPairInfo)
 
 
 def writeToFile(fileName,data):
-    tools.makeDir(rootpath+"/newMethod/")
-    f = file(rootpath+"/newMethod/"+fileName, "a+")
+    tools.makeDir(rootpath+sep+'newMethod'+sep+'')
+    f = file(rootpath+''+sep+'newMethod'+sep+''+fileName, "a+")
     # f = file(rootpath + "/路段分时段车速信息/" + '20120301', "a+")
     f.writelines(data)
     f.writelines("\n")
@@ -272,7 +277,11 @@ def generateHouxuanLuduan(point, nearbyPointSet):  # 原始点   点周围的临
             x_intersect = (b0 - b1) / (k1 - k0)  # 点和垂线的交点的坐标
             y_intersect = k0 * x_intersect + b0
 
-            if x_intersect
+            if x_intersect < min(x1, x2) or x_intersect > max(x1, x2) or y_intersect < min(y1, y2) or y_intersect > max(y1, y2):
+                x_intersect = (x1 + x2)/2
+                y_intersect = (y1 + y2)/2
+            else:
+                pass
 
             # print x_intersect
             temp1 = np.arctan(k1) / np.pi * 180
@@ -317,17 +326,19 @@ def printEouLaDis():
 if __name__ == '__main__':
     readLukou()
     readAdj()
-    dir = rootpath+'原始数据和中间结果/20120301-20120310_navigate/'  # 要访问文件夹路径
-    fffff = glob.glob(dir + '//*')
+    dir = rootpath+'原始数据和中间结果'+sep+'20120301-20120310_navigate'+sep+''  # 要访问文件夹路径
+    fffff = glob.glob(dir + ''+sep+'*')
     print 'begin'
     for file1 in fffff:
         filename1 = os.path.basename(file1)
         print filename1
-        oneDay = dir+filename1+'/'
-        f2 = glob.glob(oneDay + '//*')
+        current_date1 = filename1
+        oneDay = dir+filename1+''+sep+''
+        f2 = glob.glob(oneDay + ''+sep+'*')
         for file2 in f2:
             try:
                 filename2 = os.path.basename(file2)
+                current_car = filename2
                 print '当前正在处理文件:'+oneDay+filename2
                 carDataDict = []
                 readCar(oneDay+filename2)
