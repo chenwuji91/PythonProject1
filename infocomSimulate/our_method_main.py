@@ -15,6 +15,8 @@ def generate_potential_path_set(begin_time, end_time, begin_road_intersection, e
 
 #根据初始信息生成按照概率密度排序的一个List集合  路段查询的概率从大到小
 def generate_query_point_position_with_order(potential_path_set):
+    #首先获得每一段概率密度的参数
+
     pass
 
 
