@@ -52,7 +52,7 @@ def lognorm_together(list):#传入的参数是一系列路段的均值和标准�
     current_para0_12 = sum(para0_list)/(sum(para1_list) ** 2)
     current_para3 = sum(std_list_3)
 
-    lam0 = math.sqrt(max(std_list) ** 2 + sum(std_list_3) - 1)  #初始值
+    lam0 = math.sqrt(max(std_list) ** 2 * sum(std_list_3) - 1)  #初始值
     print lam0
 
 

@@ -1,7 +1,7 @@
 #-*- coding: UTF-8 -*-
 '''
-@author: chenwuji
-测试demo
+@author: 丁文建
+对比实验3  最少转弯
 '''
 
 import roadBasic as rd

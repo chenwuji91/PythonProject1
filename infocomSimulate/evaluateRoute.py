@@ -1,7 +1,7 @@
 #-*- coding: UTF-8 -*-
 '''
-@author: chenwuji zw
-测试demo
+@author: 张文
+路段评分程序
 '''
 class comSubseq:
     def __init__(self):

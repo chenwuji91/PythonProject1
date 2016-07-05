@@ -1,7 +1,7 @@
 #-*- coding: UTF-8 -*-
 '''
-@author: chenwuji zw
-测试demo
+@author: 张文
+搜索所有潜在的可能路径
 '''
 
 import roadBasic as rd
