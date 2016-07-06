@@ -46,6 +46,7 @@ def rDFS(roadIntersection1, roadIntersection2, Time, level) :
         # 找到了一条路径
         tempRoute = route[:]
         tempRoute.append(roadIntersection1)
+        print '路径搜索状态:'
         print(tempRoute)
         routeList.append(tuple(tempRoute))
         return
@@ -69,6 +70,8 @@ def searchAllRoad(roadIntersection1, roadIntersection2, Time) :
 
     return list(routeSet)
 
-print rd.judgeBounds('1000')  #找的是园区外的  在处理的时候 要改一下底层函数或者改进一下相关的判断
-print rd.judgeBounds('947')
-print searchAllRoad('1000', '947', 80)
+
+if __name__ == '__main__':
+    print rd.judgeBounds('1000')  #找的是园区外的  在处理的时候 要改一下底层函数或者改进一下相关的判断
+    print rd.judgeBounds('947')
+    print searchAllRoad('1000', '947', 80)

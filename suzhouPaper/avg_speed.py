@@ -34,7 +34,8 @@ def re_write_by_time_slot(each_car_path):
             time_split = tools.timeTranslate(car_date)
             ifweekend = tools.getDay(car_date)
             tools.makeDir(rootpath + 'avg_speed'+'/time_split/')
-            tools.writeToFile(rootpath + 'avg_speed'+'/time_split/'+str(time_split)+'_'+str(ifweekend), car_speed+'\t')
+            if car_speed!='0':
+                tools.writeToFile(rootpath + 'avg_speed'+'/time_split/'+str(time_split)+'_'+str(ifweekend), car_speed+'\t')
 
 
 def avg(each_split):
@@ -47,10 +48,10 @@ def avg(each_split):
 
 
 if __name__ == '__main__':
-    # file_list = getFileList()
+    # file_list = getFileList('原始数据和中间结果/data/')
     # for eachF in file_list:
     #     re_write_by_time_slot(eachF)
-    #
+
     path = 'avg_speed'+'/time_split/'
     file_list = glob.glob(rootpath + path + '/*')
     print file_list

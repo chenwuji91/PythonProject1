@@ -13,12 +13,12 @@ import matplotlib.pyplot as plt
 # print norm
 # print norm.cdf(2)
 #
-# from scipy import stats
-# import matplotlib.pyplot as plt
-# x = np.linspace(stats.norm.ppf(0.01,30,3.56), stats.norm.ppf(0.99,30,3.56), 100)
-# # x = np.linspace(-1, 1, 100)
-# plt.plot(x, stats.norm.pdf(x,30,3.56), 'r-', alpha=0.6, label='norm pdf')
-# plt.show()
+from scipy import stats
+import matplotlib.pyplot as plt
+x = np.linspace(stats.norm.ppf(0.01,30,3.56), stats.norm.ppf(0.99,30,3.56), 100)
+# x = np.linspace(-1, 1, 100)
+plt.plot(x, stats.norm.pdf(x,30,3.56), 'r-', alpha=0.6, label='norm pdf')
+plt.show()
 
 # x = np.linspace(norm.ppf(0.01),norm.ppf(0.99), 100)
 # # ax.plot(x, norm.pdf(x),'r-', lw=5, alpha=0.6, label='norm pdf')
