@@ -66,3 +66,6 @@ def writeToFile(fileName,data):
     f.writelines("\n")
     f.close()
 
+
+if __name__ == '__main__':
+    print timeRetranslate(73)

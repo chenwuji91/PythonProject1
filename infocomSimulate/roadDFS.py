@@ -12,7 +12,7 @@ rd.initRoadData()
 MAX_VELOCITY = 20
 
 # 允许的搜索深度
-level = 20
+level = 10
 
 # 一条路径
 route = []
@@ -72,6 +72,9 @@ def searchAllRoad(roadIntersection1, roadIntersection2, Time) :
 
 
 if __name__ == '__main__':
-    print rd.judgeBounds('1000')  #找的是园区外的  在处理的时候 要改一下底层函数或者改进一下相关的判断
-    print rd.judgeBounds('947')
-    print searchAllRoad('1000', '947', 80)
+    print rd.judgeBounds('1007')  #找的是园区外的  在处理的时候 要改一下底层函数或者改进一下相关的判断
+    print rd.judgeBounds('923')
+    # print searchAllRoad('1007', '923', 80)
+    print searchAllRoad('1000','947',80)
+    print searchAllRoad('1000','947',80)
+    print searchAllRoad('1007','923',80)

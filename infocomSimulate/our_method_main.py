@@ -4,6 +4,8 @@
 实验主类   控制整个实验流程 调用相关的方法得到相关的结果
 '''
 import roadBasic as rd
+rd.initRoadData()
+rd.initTimeData()
 import tools
 
 #产生道路的所有候选路段的集合
@@ -17,19 +19,31 @@ def generate_potential_path_set(begin_time, end_time, begin_road_intersection, e
     potential_set = roadDFS.searchAllRoad('1000', '947', 80)
     return potential_set
 
-def generate_s_pdf_function_list(potential_path):
+def generate_s_pdf_function_list(potential_path, query_date):   # potential_path 接收的是点的保存信息
     s_pdf_function_list = []
     import fsolve
-    for i in len(len(potential_path)):
-        rd.getRoadTimeVariance(potential_path[i],
-                               rd.getRoadTimeAvg('1016','895',str(tools.timeTranslate('2012-03-02 09:58:23')),1)))
-
-
+    ifweekend = tools.getDay(query_date)  #需要查询的日期是否为周末
+    for each_s in potential_path:
+        current_s_para = []
+        for i in range(len(each_s)-1):  #总共应该是有这么多的路径数量  这里有时候会有数据取不到  要处理数据娶不到的情况
+            current_variance = rd.getRoadTimeVariance(each_s[i], each_s[i + 1],str(tools.timeTranslate(query_date)),ifweekend)
+            current_mean = rd.getRoadTimeAvg(each_s[i], each_s[i + 1],str(tools.timeTranslate(query_date)),ifweekend)
+            current_s_para.append((current_mean,current_variance))
+        current_s_fun = fsolve.lognorm_together(current_s_para)
+        s_pdf_function_list.append(current_s_fun)
+    return s_pdf_function_list
 
 
 #根据初始信息生成按照概率密度排序的一个List集合  路段查询的概率从大到小
-def generate_query_point_position_with_order(potential_path_set):
+def generate_query_point_position_with_order(potential_path_set, s_pdf_function_list, begin_time, end_time):
     #首先获得每一段概率密度的参数
+    probility_list_with_time_interval = []
+    time_interval = tools.intervalofSeconds(begin_time, end_time)
+    for each_f in s_pdf_function_list:
+        probility_list_with_time_interval.append(each_f(time_interval))  #计算每一个路径的概率
+
+    #先建立道路link的一个集合:
+
 
 
     pass
@@ -46,27 +60,50 @@ def ask_taxi_if_exist(road_intersection1, road_intersection2, query_time):
     return True
     pass
 
-stop_prob = 0.5
+
+def translate_potential_path(potential_list):#将点的表示转换成为边的一个表示
+    translated_set = []
+    for eachS in potential_list:
+        each_translated_path = []
+        for i in range(len(eachS)-1):
+            each_translated_path.append((eachS[i],eachS[i + 1]))
+        translated_set.append(each_translated_path)
+    return translated_set
+
+def re_translate_potential_path(potential_list):#将边的表示转换成为点的表示
+    translated_set = []
+    for eachS in potential_list:
+        each_translated_path = []
+        for i in range(len(eachS)-1):
+            each_translated_path.append(eachS[i][0])
+        each_translated_path.append(eachS[len(eachS)-1][0])
+        each_translated_path.append(eachS[len(eachS)-1][1])
+        translated_set.append(each_translated_path)
+    return translated_set
+
+
 
 #主要流程控制及调用
 def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersection):
-    current_prob = 0
     # 生成所有候选路段的一个集合
-    potential_path_set = generate_potential_path_set()
+    potential_path_set = generate_potential_path_set(begin_time, end_time, begin_road_intersection, end_road_intersection)   #List(('12','32'),('12','45'),('22','63'))
+    #下面的是测试数据
+    potential_path_set = [('1007', '1009', '1122', '1186', '792', '814'),('1007', '1009', '1122', '1186', '792', '814','994')]
+
     # 生成所有潜在路径组合的pdf函数  需要传入当前可能的路径集合以及需要生成的时间段
-    s_pdf_function_list = generate_s_pdf_function_list(potential_path_set,
+    s_pdf_function_list = generate_s_pdf_function_list(potential_path_set,'2012-03-05 07:18:18')
+    # print s_pdf_function_list[0](70)    #输入任意的时间  是可以返回这个时间对应的概率
+    print 'pdf函数生成完毕1 '
+
+    potential_path_set = translate_potential_path(potential_path_set)  #将候选集合的数据格式进行转换 将点的表示转换成边的表示
+
+    road_link_prob = generate_query_point_position_with_order(potential_path_set,s_pdf_function_list, begin_time, end_time)  #生成一个按照概率从高到低的一个查询路段的排序  并且里面应至少包含有link的概率数据
 
 
-
-
-    road_link_prob = generate_query_point_position_with_order(potential_path_set)  #生成一个按照概率从高到低的一个查询路段的排序  并且里面应至少包含有link的概率数据
     for each_link_prob in road_link_prob:  #对每一个路段确定一个查询时间  针对这个查询时间来询问出租车 得到一组正确或者错误的值 可以是最后某个link的组合的s达到一个概率的阀值之后  就输出这个序列
         query_time = generate_best_query_point_time(each_link_prob)   #在什么时间查这一段路获得的概率最大
         ask_result = ask_taxi_if_exist(each_link_prob,query_time)  #each_link_prob可以是一个元组 保存了多个信息
-        if ask_result == True:  #随便写的 就是判断查询到了多少个正确之后  就终止
-            current_prob = current_prob + 0.1   #查询到某一条路会把整个的概率提高多少
-        if current_prob > stop_prob:
-            break
+
     result_set = potential_path_set[0]  #返回第几条结果作为最后的结果值
     # result_set = []  #结果集   是一个路段的集合
     return result_set  #返回查询结果
@@ -75,5 +112,10 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
 
 
 
-
+if __name__ == '__main__':
+    # main_flow('2012-03-03 19:21,18','2012-03-03 19:24,18','1000','947')
+    potential_path_set = [('1007', '1009', '1122', '1186', '792', '814'),
+                          ('1007', '1009', '1122', '1186', '792', '814', '994')]
+    print translate_potential_path(potential_path_set)
+    print re_translate_potential_path(translate_potential_path(potential_path_set))
 
