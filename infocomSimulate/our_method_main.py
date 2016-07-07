@@ -76,21 +76,22 @@ def generate_best_query_point_time(most_likely_road_link, potential_path_set, s_
     #下面开始对包含这个link的所有路段开始求解积分的问题
     for each_path_contains_link in list_s_index_contains_most_likely_road_link: #对于每一个包含这个link的路段来求解时间
         #正常的情况是分成这几段   考虑边界情况呢?
-        path_sb = potential_path_set[each_path_contains_link[i][0:j]]
-        path_r = potential_path_set[each_path_contains_link[i][j]]
-        path_sa = potential_path_set[each_path_contains_link[i][j+1:len(each_path_contains_link[i])]]
+        path_sb = potential_path_set[each_path_contains_link[0]][0:each_path_contains_link[1]]
+        path_r = potential_path_set[each_path_contains_link[0]][each_path_contains_link[1]]
+        path_sa = potential_path_set[each_path_contains_link[0]][each_path_contains_link[1]+1:len(potential_path_set[each_path_contains_link[0]])]
         for i in range(1,delta_time):  #对于每一个分块的时间间隔 时间离散化操作
-            fun1 = fsolve.potential_path_to_fsolve(tools.re_translate_potential_path(path_sb), begin_time, rd)
+            fun1 = fsolve.potential_path_to_fsolve(tools.re_translate_one_potential_path(path_sb), begin_time, rd)
             fun2 = stats.lognorm.pdf   #x,s,mean,variance
-            fun2_mean = rd.getRoadTimeAvg(path_r[0],path_r[1], tools.timeTranslate(begin_time), tools.getDay(begin_time))
-            fun2_variance = rd.getRoadTimeVariance(path_r[0],path_r[1], tools.timeTranslate(begin_time), tools.getDay(begin_time))
-            fun3 = fsolve.potential_path_to_fsolve(tools.re_translate_potential_path(path_sa), begin_time, rd)
+            fun2_mean = rd.getRoadTimeAvg(path_r[0],path_r[1], str(tools.timeTranslate(begin_time)), tools.getDay(begin_time))
+            fun2_variance = rd.getRoadTimeVariance(path_r[0],path_r[1], str(tools.timeTranslate(begin_time)), tools.getDay(begin_time))
+            fun3 = fsolve.potential_path_to_fsolve(tools.re_translate_one_potential_path(path_sa), begin_time, rd)
             def fun4(x):
                 return i - x
             def fun5(x):
                 return delta_t - x
-            prob1 = dblquad.fun_2d(fun1, (fun2,fun2_mean,fun2_variance), fun3, 0, i, delta_time, fun4, fun5)  #求解积分
-
+            prob1 = dblquad.fun_2d(fun1, (fun2,fun2_mean,fun2_variance), fun3, i, delta_time, fun4, fun5)  #求解积分
+            print '输出一个概率:',
+            print prob1
 
         pass
     pass
@@ -115,7 +116,7 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
     potential_path_set = [('1007', '1009', '1122', '1186', '792', '814'),('1007', '1009', '1122', '1186', '792', '814','994')]
 
     # 生成S={s1,s2...sn}的pdf函数  需要传入当前可能的路径集合以及需要生成的时间段  这个时间是这个时段的起始时刻就好了
-    s_pdf_function_list = generate_s_pdf_function_list(potential_path_set,'2012-03-05 07:18:18')
+    s_pdf_function_list = generate_s_pdf_function_list(potential_path_set, begin_time)
 
     print 'pdf函数生成完毕1 '       # print s_pdf_function_list[0](70)    #输入任意的时间  是可以返回这个时间对应的概率
 
@@ -143,7 +144,7 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
 
 
 if __name__ == '__main__':
-    main_flow('2012-03-03 19:21:18','2012-03-03 19:24:18','1000','947')
+    main_flow('2012-03-05 07:18:18','2012-03-05 07:22:18','1000','947')
     potential_path_set = [('1007', '1009', '1122', '1186', '792', '814'),
                           ('1007', '1009', '1122', '1186', '792', '814', '994')]
     print tools.translate_potential_path(potential_path_set)

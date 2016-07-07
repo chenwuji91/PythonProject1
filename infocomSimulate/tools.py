@@ -86,7 +86,14 @@ def re_translate_potential_path(potential_list):#将边的表示转换成为点�
         translated_set.append(each_translated_path)
     return translated_set
 
+def re_translate_one_potential_path(potential_list):#将边的表示转换成为点的表示
+    translated_set = []
+    for eachS in potential_list:
+        translated_set.append(eachS[0])
+    translated_set.append(eachS[1])
+    return translated_set
 
 
 if __name__ == '__main__':
     print timeRetranslate(73)
+    print re_translate_one_potential_path([('1007', '1009'), ('1009', '1122')])
