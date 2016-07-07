@@ -66,6 +66,27 @@ def writeToFile(fileName,data):
     f.writelines("\n")
     f.close()
 
+def translate_potential_path(potential_list):#将点的表示转换成为边的一个表示
+    translated_set = []
+    for eachS in potential_list:
+        each_translated_path = []
+        for i in range(len(eachS)-1):
+            each_translated_path.append((eachS[i],eachS[i + 1]))
+        translated_set.append(each_translated_path)
+    return translated_set
+
+def re_translate_potential_path(potential_list):#将边的表示转换成为点的表示
+    translated_set = []
+    for eachS in potential_list:
+        each_translated_path = []
+        for i in range(len(eachS)-1):
+            each_translated_path.append(eachS[i][0])
+        each_translated_path.append(eachS[len(eachS)-1][0])
+        each_translated_path.append(eachS[len(eachS)-1][1])
+        translated_set.append(each_translated_path)
+    return translated_set
+
+
 
 if __name__ == '__main__':
     print timeRetranslate(73)

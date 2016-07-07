@@ -8,16 +8,20 @@ import numpy as np
 from scipy import integrate
 from scipy import stats
 
-def half_sphere(x, y):
-    return (1-x**2-y**2)**0.5
-
-def half_circle(x):
-    return (1-x**2)**0.5
+# def half_sphere(x, y):
+#     return (1-x**2-y**2)**0.5
+#
+# def half_circle(x):
+#     return (1-x**2)**0.5
 
 
 #注意 这个norm到后面换成新的那个整体的概率密度函数  现在暂时用标准正态分布函数做一个代替  到时候具体的函数可以作为一个参数传入这里
-def fun_2d(a1, a2):
-    stats.norm()
+def fun_2d(fun1, fun2, fun3, t, T, fun4, fun5 ):
+    def f(a1, a2):
+        fun1(a1) * fun2[0](a2, 1,fun2[1], fun2[2]) * fun3(T - a1 -a2)
+
+    return integrate.dblquad(f, 0, t, fun4, fun5)
+
 
 if __name__ == '__main__':
     pass

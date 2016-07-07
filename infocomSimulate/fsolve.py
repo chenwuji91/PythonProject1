@@ -68,9 +68,8 @@ def fsolve_main(list):#传入的参数是一系列路段的均值和标准差  �
 
 
 def lognorm_together(list2):
-    list3 = []
-    for eache in list2:
-        list3.append((math.log(eache[0]),math.log(eache[1])))
+    list3 = list2
+
     lamx = fsolve_main(list3)
     w = math.sqrt((1+lamx**2)/current_para3)
     para4_list = []
@@ -85,8 +84,19 @@ def lognorm_together(list2):
     def f_all(x):
         return 2/(w * x) * stats.norm.cdf(lamx * (math.log(x,math.e) - kesai) / w) * stats.norm.pdf((math.log(x,math.e)-kesai)/w)
 
-
     return f_all
+
+import tools
+def potential_path_to_fsolve(each_s, query_date, rd):
+    ifweekend = tools.getDay(query_date)  # 需要查询的日期是否为周末
+    current_s_para = []
+    for i in range(len(each_s) - 1):  # 总共应该是有这么多的路径数量  这里有时候会有数据取不到  要处理数据娶不到的情况
+        current_variance = rd.getRoadTimeVariance(each_s[i], each_s[i + 1], str(tools.timeTranslate(query_date)),ifweekend)
+        current_mean = rd.getRoadTimeAvg(each_s[i], each_s[i + 1], str(tools.timeTranslate(query_date)), ifweekend)
+        current_s_para.append((current_mean, current_variance))
+        current_s_fun = lognorm_together(current_s_para)
+    return current_s_fun
+
 
 
 if __name__ == '__main__':

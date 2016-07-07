@@ -12,7 +12,7 @@ rd.initRoadData()
 MAX_VELOCITY = 20
 
 # 允许的搜索深度
-level = 10
+level = 30
 
 # 一条路径
 route = []
@@ -24,7 +24,7 @@ routeList = []
 def adjionInter(roadIntersection) :
     adjionList = rd.getNeighbourList(roadIntersection)
     for roadInter in adjionList :
-        if (rd.judgeBounds(roadInter)) :
+        if (rd.judgeBounds(roadInter)==False) :
             adjionList.remove(roadInter)
 
     return adjionList
@@ -77,4 +77,4 @@ if __name__ == '__main__':
     # print searchAllRoad('1007', '923', 80)
     print searchAllRoad('1000','947',80)
     print searchAllRoad('1000','947',80)
-    print searchAllRoad('1007','923',80)
+    print searchAllRoad('1007','994',200)
