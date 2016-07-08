@@ -63,7 +63,7 @@ def generate_query_point_position_with_order(potential_path_set, s_pdf_function_
 
 #根据查询路段求积分生成最佳的查询时间   返回一个t  这个t最佳的查询时间
 def generate_best_query_point_time(most_likely_road_link, potential_path_set, s_pdf_function_list, begin_time, end_time):
-    delta_t = 1   #求解定积分的时候 时间的变化率
+    delta_t = 6   #求解定积分的时候 时间的变化率
     delta_time = int(tools.intervalofSeconds(begin_time, end_time))
     import fsolve
     from scipy import stats
@@ -79,20 +79,27 @@ def generate_best_query_point_time(most_likely_road_link, potential_path_set, s_
         path_sb = potential_path_set[each_path_contains_link[0]][0:each_path_contains_link[1]]
         path_r = potential_path_set[each_path_contains_link[0]][each_path_contains_link[1]]
         path_sa = potential_path_set[each_path_contains_link[0]][each_path_contains_link[1]+1:len(potential_path_set[each_path_contains_link[0]])]
+        prob_list = []
+        fun1 = fsolve.potential_path_to_fsolve(tools.re_translate_one_potential_path(path_sb), begin_time, rd)
+        fun2 = stats.lognorm.pdf  # x,s,mean,variance
+        fun2_mean = rd.getRoadTimeAvg(path_r[0], path_r[1], str(tools.timeTranslate(begin_time)),
+                                      tools.getDay(begin_time))
+        fun2_variance = rd.getRoadTimeVariance(path_r[0], path_r[1], str(tools.timeTranslate(begin_time)),
+                                               tools.getDay(begin_time))
+        fun3 = fsolve.potential_path_to_fsolve(tools.re_translate_one_potential_path(path_sa), begin_time, rd)
+
         for i in range(1,delta_time):  #对于每一个分块的时间间隔 时间离散化操作
-            fun1 = fsolve.potential_path_to_fsolve(tools.re_translate_one_potential_path(path_sb), begin_time, rd)
-            fun2 = stats.lognorm.pdf   #x,s,mean,variance
-            fun2_mean = rd.getRoadTimeAvg(path_r[0],path_r[1], str(tools.timeTranslate(begin_time)), tools.getDay(begin_time))
-            fun2_variance = rd.getRoadTimeVariance(path_r[0],path_r[1], str(tools.timeTranslate(begin_time)), tools.getDay(begin_time))
-            fun3 = fsolve.potential_path_to_fsolve(tools.re_translate_one_potential_path(path_sa), begin_time, rd)
-            def fun4(x):
-                return i - x
-            def fun5(x):
-                return delta_t - x
+
+            def fun4(a1):
+                return i - a1
+            def fun5(a1):
+                return delta_t - a1
             prob1 = dblquad.fun_2d(fun1, (fun2,fun2_mean,fun2_variance), fun3, i, delta_time, fun4, fun5)  #求解积分
             print '输出一个概率:',
             print prob1
-
+            prob_list.append(prob1)
+            pass
+        print prob_list
         pass
     pass
 
@@ -144,7 +151,7 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
 
 
 if __name__ == '__main__':
-    main_flow('2012-03-05 07:18:18','2012-03-05 07:22:18','1000','947')
+    main_flow('2012-03-05 07:18:18','2012-03-05 07:19:18','1000','947')
     potential_path_set = [('1007', '1009', '1122', '1186', '792', '814'),
                           ('1007', '1009', '1122', '1186', '792', '814', '994')]
     print tools.translate_potential_path(potential_path_set)

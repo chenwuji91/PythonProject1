@@ -59,8 +59,8 @@ def fsolve_main(list):#传入的参数是一系列路段的均值和标准差  �
     # print lam0
 
     result = fsolve(f, lam0)
-    print 'The Result of fsolve is:',
-    print result[0]
+    # print 'The Result of fsolve is:',
+    # print result[0]
     return result[0]
 
 
@@ -77,7 +77,7 @@ def lognorm_together(list2):
         para4_list.append(math.pow(math.e,eache[0]) * math.pow(math.e, eache[1]**2 / 2))
     kesai = math.log(sum(para4_list)) - 0.5 * math.pow(w,2) - math.log(stats.norm.cdf(lamx/math.sqrt(current_para3)))
 
-    print (lamx,w,kesai)
+    # print (lamx,w,kesai)
     # def f_all(x):
     #     return 2/w * stats.norm.cdf(lamx * (x - kesai) / w) * stats.norm.pdf((x-kesai)/w)
 

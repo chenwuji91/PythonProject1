@@ -17,18 +17,21 @@ def half_circle(x):
 
 #注意 这个norm到后面换成新的那个整体的概率密度函数  现在暂时用标准正态分布函数做一个代替  到时候具体的函数可以作为一个参数传入这里
 def fun_2d(fun1, fun2, fun3, t, T, fun4, fun5 ):
-    print t
-    print fun1(30)
-    print fun2[0](5, 1,fun2[1], fun2[2])
-    print fun3(20)
+
+
 
     def f(a1, a2):
-        print a1
-        print a2
-        print T - a1 - a2
+        # print a1
+        # print a2
+        # print T - a1 - a2
+        # print 'fun4:',
+        # print fun4(a),
+        # print 'lambda:',
+        # print t - a1
+
         return fun1(a1) * fun2[0](a2, 1,fun2[1], fun2[2]) * fun3(T - a1 -a2)
 
-    return integrate.dblquad(f, 0, t, fun4, fun5)
+    return integrate.dblquad(f, 0, t, lambda ax:t - ax, lambda ax: T-ax)
 
 
 if __name__ == '__main__':
