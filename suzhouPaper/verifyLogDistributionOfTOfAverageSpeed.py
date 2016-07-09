@@ -9,10 +9,10 @@
 #读取文件的时候  先读取suzhou1——10的列表  然后在另外一个目录下做正则匹配 读取相关的所有文件  一个路口存到一个集合中进行操作
 #操作包括周末的判断 时间段元组的划分 等
 import tools
-path1 = '/Users/chenwuji/Documents/苏州出租车/newMethod/'
-path2 = '/Users/chenwuji/Documents/苏州出租车/newMethod2/newMethod1/'
-outputPathSingleRsult = '/Users/chenwuji/Documents/苏州出租车/按照平均速度检测对数正态时间结果/检验平均速度的/'
-outpathResultDate = '/Users/chenwuji/Documents/苏州出租车/按照平均速度检测对数正态时间结果/按照日期的检验平均速度/'
+path1 = '/Users/chenwuji/Documents/苏州出租车/最近的车辆轨迹数据0707/newMethod/'
+path2 = '/Users/chenwuji/Documents/苏州出租车/最近的车辆轨迹数据0707/newMethod1/'
+outputPathSingleRsult = '/Users/chenwuji/Documents/苏州出租车/按照平均速度检测对数正态时间结果/检验平均速度的new0709/'
+outpathResultDate = '/Users/chenwuji/Documents/苏州出租车/按照平均速度检测对数正态时间结果/按照日期的检验平均速度new0709/'
 tools.makeDir(outpathResultDate)
 tools.makeDir(outputPathSingleRsult)
 
@@ -76,7 +76,7 @@ def dataFilter(oneFileDataList):
         timeInfo = tools.timeTranslate(date1)
         dis = tools.calculate(lukouDict.get(currentPri).x, lukouDict.get(currentPri).y,
                               lukouDict.get(currentLater).x, lukouDict.get(currentLater).y)
-        if speed > 5.0 and time_interval < 200 and speed < 100:
+        if speed > 1.0 and time_interval < 200 and speed < 100:
             time1 = dis/speed
             basicInfo = (currentPri, currentLater, timeInfo, ifweekend)
             if currentRoadDict.__contains__(basicInfo):
@@ -109,7 +109,8 @@ def KSTest(dataDict):
             # if eachE > floorList and eachE < ceilList:
                 x.append((eachE - listMean) / liststd)
                 x1.append(eachE)
-        test_stat = kstest(x, 'norm')
+        # test_stat = kstest(x, 'norm')
+        test_stat = [0.5,0.05]
         tools.makeDir(outputPathSingleRsult)
         tools.writeToFile(outputPathSingleRsult + str(eachRecord[0]) + '_' + str(eachRecord[1]) + '_' +str(eachRecord[3]),
                           str(eachRecord) + ':' + str(test_stat)+';' + str(x1) +';'+ str(listMean) + ';' + str(liststd))
