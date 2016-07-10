@@ -61,10 +61,12 @@ def generate_query_point_position_with_order(potential_path_set, s_pdf_function_
 
 
 
-#根据查询路段求积分生成最佳的查询时间   返回一个t  这个t最佳的查询时间
+#根据查询路段求积分生成最佳的查询时间   返回一个t  这个t最佳的查询时间 以及最佳的一个查询路段
 def generate_best_query_point_time(most_likely_road_link, potential_path_set, s_pdf_function_list, begin_time, end_time):
-    delta_t = 6   #求解定积分的时候 时间的变化率
+    init_time = 1
+    delta_t = 3   #求解定积分的时候 时间的变化率
     delta_time = int(tools.intervalofSeconds(begin_time, end_time))
+    dict_result = {}
     import fsolve
     from scipy import stats
     import dblquad
@@ -87,21 +89,28 @@ def generate_best_query_point_time(most_likely_road_link, potential_path_set, s_
         fun2_variance = rd.getRoadTimeVariance(path_r[0], path_r[1], str(tools.timeTranslate(begin_time)),
                                                tools.getDay(begin_time))
         fun3 = fsolve.potential_path_to_fsolve(tools.re_translate_one_potential_path(path_sa), begin_time, rd)
-
-        for i in range(1,delta_time):  #对于每一个分块的时间间隔 时间离散化操作
-
-            def fun4(a1):
-                return i - a1
-            def fun5(a1):
-                return delta_t - a1
-            prob1 = dblquad.fun_2d(fun1, (fun2,fun2_mean,fun2_variance), fun3, i, delta_time, fun4, fun5)  #求解积分
+        for i in range(init_time, delta_time, delta_t):  #对于每一个分块的时间间隔 时间离散化操作
+            # def fun4(a1):
+            #     return i - a1
+            # def fun5(a1):
+            #     return delta_t - a1
+            prob1 = dblquad.fun_2d(fun1, (fun2,fun2_mean,fun2_variance), fun3, i, delta_time)  #求解积分
             print '输出一个概率:',
             print prob1
-            prob_list.append(prob1)
+            prob_list.append(prob1[0]/)
             pass
-        print prob_list
-        pass
-    pass
+
+        print prob_list #跑完这个link属于一个路段的情况
+        max_prob = max(prob_list)   #最大的这个概率
+        max_index = prob_list.index(max_prob)  #取到最大概率的索引
+        best_query_time = init_time + max_index * delta_t  #这个概率对应的最佳查询点
+        list_link_pro_belongs_to_s = each_path_contains_link[0]    #查看这个路径概率对应的外面的s是什么
+        query_prob = max_prob * s_pdf_function_list[list_link_pro_belongs_to_s](delta_time)    #某个路段s对应的后验概率的最大值
+        dict_result.setdefault(query_prob,(best_query_time,potential_path_set[each_path_contains_link[0]][each_path_contains_link[1]]
+                                            ,potential_path_set[each_path_contains_link[0]]))   #保存字典,key为概率值,value为(最佳查询时间,最佳查询路段,该查询路段属于哪个路径)
+
+    return sorted(dict_result.items(), lambda x, y: cmp(x[0], y[0]), reverse=True)  #返回一个排序过的带概率的list
+
 
 
 #询问出租车车辆是不是在这个地方   输入一辆车在的路口以及需要查询的时间
@@ -137,6 +146,10 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
 
     #返回的是 具有最大的概率的查询点,包括被查询路段  查询时间  查询路段的序列等
     best_query_time = generate_best_query_point_time(road_link_prob[0],potential_path_set,s_pdf_function_list, begin_time, end_time)
+    print 'Best_query_result:',
+    print best_query_time
+
+
 
     for each_link_prob in road_link_prob:  #对每一个路段确定一个查询时间  针对这个查询时间来询问出租车 得到一组正确或者错误的值 可以是最后某个link的组合的s达到一个概率的阀值之后  就输出这个序列
         query_time = generate_best_query_point_time(each_link_prob)   #在什么时间查这一段路获得的概率最大

@@ -38,43 +38,140 @@ def getRoadSpeedAvg(roadIntersection1, roadIntersection2, time1, ifweekend):#返
 
 def getRoadSpeedVariance(roadIntersection1, roadIntersection2,time1, ifweekend):#返回float类型 方差
     if ifweekend == 1:
-        allLukou = weekend_speed_avg_varivace_para.get(time1)
+        allLukou = weekend_speed_avg_varivace_para.get(str(time1))
         if allLukou.__contains__((roadIntersection1, roadIntersection2)):
             return allLukou.get((roadIntersection1, roadIntersection2))[1]
         else:
             print 'No info'
 
     else:
-        allLukou = weekday_speed_avg_varivace_para.get(time1)
+        allLukou = weekday_speed_avg_varivace_para.get(str(time1))
         if allLukou.__contains__((roadIntersection1, roadIntersection2)):
             return allLukou.get((roadIntersection1, roadIntersection2))[1]
         else:
             print 'No info'
+
+
+#time1时刻是否有路段roadIntersection1--roadIntersection2信息
+def f1(roadIntersection1, roadIntersection2, time1, ifweekend):
+    if (time1 < 70 or time1 > 200):
+        return False
+    if ifweekend == 1:
+        allLukou = weekend_time_avg_varivace_para.get(str(time1))
+    else:
+        allLukou = weekday_time_avg_varivace_para.get(str(time1))
+    return allLukou.__contains__((roadIntersection1, roadIntersection2))
+
+
+#time1时刻是否有路段roadIntersection1--roadIntersection2相邻路段信息
+def f2(roadIntersection1, roadIntersection2, time1, ifweekend):
+    neibour1 = getNeighbourList(roadIntersection1)
+    r1 = roadIntersection1
+    r2 = roadIntersection2
+    flag = False
+    for eachInter1 in neibour1:
+        if f1(eachInter1, roadIntersection1, time1, ifweekend):
+            flag = True
+            r1 = eachInter1
+            r2 = roadIntersection1
+            break
+    if flag == False:
+        neibour2 = getNeighbourList(roadIntersection2)
+        for eachInter2 in neibour2:
+            if f1(roadIntersection2, eachInter2, time1, ifweekend):
+                flag = True
+                r1 = roadIntersection2
+                r2 = eachInter2
+                break
+    return [flag, r1, r2]
 
 def getRoadTimeAvg(roadIntersection1, roadIntersection2, time1, ifweekend):
+    time1 = int(time1)
+    t = time1
+    r1 = roadIntersection1
+    r2 = roadIntersection2
+    while f1(roadIntersection1, roadIntersection2, time1, ifweekend) == False:
+        #相邻时间的此路段
+        if f1(roadIntersection1, roadIntersection2, time1 + 1, ifweekend):
+            t = time1 + 1
+            break
+        if f1(roadIntersection1, roadIntersection2, time1 - 1, ifweekend):
+            t = time1 - 1
+            break
+
+        #相邻路段的此时间
+        temp = f2(roadIntersection1, roadIntersection2, time1, ifweekend)
+        if temp[0]:
+            t = time1
+            r1 = temp[1]
+            r2 = temp[2]
+            break
+
+        #相邻路段相邻时刻
+        temp = f2(roadIntersection1, roadIntersection2, time1 + 1, ifweekend)
+        if temp[0]:
+            t = time1 + 1
+            r1 = temp[1]
+            r2 = temp[2]
+            break
+        temp = f2(roadIntersection1, roadIntersection2, time1 - 1, ifweekend)
+        if temp[0]:
+            t = time1 - 1
+            r1 = temp[1]
+            r2 = temp[2]
+            break
+        time1 += 3
+
     if ifweekend == 1:
-        allLukou = weekend_time_avg_varivace_para.get(time1)
-        if allLukou.__contains__((roadIntersection1,roadIntersection2)):
-            return allLukou.get((roadIntersection1,roadIntersection2))[0]
-        else:
-            print 'No info'
+        allLukou = weekend_time_avg_varivace_para.get(str(t))
     else:
-        allLukou = weekday_time_avg_varivace_para.get(time1)
-        if allLukou.__contains__((roadIntersection1, roadIntersection2)):
-            return allLukou.get((roadIntersection1, roadIntersection2))[0]
-        else:
-            print 'No info'
+        allLukou = weekday_time_avg_varivace_para.get(str(t))
+    return allLukou.get((r1, r2))[0]
+
 
 
 def getRoadTimeVariance(roadIntersection1, roadIntersection2, time1, ifweekend):
+    time1 = int(time1)
+    t = time1
+    r1 = roadIntersection1
+    r2 = roadIntersection2
+    while f1(roadIntersection1, roadIntersection2, time1, ifweekend) == False:
+        #相邻时间的此路段
+        if f1(roadIntersection1, roadIntersection2, time1 + 1, ifweekend):
+            t = time1 + 1
+            break
+        if f1(roadIntersection1, roadIntersection2, time1 - 1, ifweekend):
+            t = time1 - 1
+            break
+
+        #相邻路段的此时间
+        temp = f2(roadIntersection1, roadIntersection2, time1, ifweekend)
+        if temp[0]:
+            t = time1
+            r1 = temp[1]
+            r2 = temp[2]
+            break
+
+        #相邻路段相邻时刻
+        temp = f2(roadIntersection1, roadIntersection2, time1 + 1, ifweekend)
+        if temp[0]:
+            t = time1 + 1
+            r1 = temp[1]
+            r2 = temp[2]
+            break
+        temp = f2(roadIntersection1, roadIntersection2, time1 - 1, ifweekend)
+        if temp[0]:
+            t = time1 - 1
+            r1 = temp[1]
+            r2 = temp[2]
+            break
+        time1 += 3
+
     if ifweekend == 1:
-        allLukou = weekend_time_avg_varivace_para.get(time1)
-        return allLukou.get((roadIntersection1,roadIntersection2))[1]
+        allLukou = weekend_time_avg_varivace_para.get(str(t))
     else:
-        allLukou = weekday_time_avg_varivace_para.get(time1)
-        return allLukou.get((roadIntersection1, roadIntersection2))[1]
-
-
+        allLukou = weekday_time_avg_varivace_para.get(str(t))
+    return allLukou.get((r1, r2))[1]
 
 def judgeBounds(roadIntersection):
     position = getRoadPointLocation(roadIntersection)
