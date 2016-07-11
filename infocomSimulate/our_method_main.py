@@ -87,16 +87,42 @@ def generate_best_query_point_time(most_likely_road_link, potential_path_set, s_
         prob_list_of_one_link = []
         path_sb = potential_path_set[each_path_contains_link[0]][0:each_path_contains_link[1]]
         path_r = potential_path_set[each_path_contains_link[0]][each_path_contains_link[1]]
+        path_r = [path_r]
         path_sa = potential_path_set[each_path_contains_link[0]][each_path_contains_link[1]+1:len(potential_path_set[each_path_contains_link[0]])]
-        print path_sb
-        fun1 = fsolve.potential_path_to_fsolve(tools.re_translate_one_potential_path(path_sb), begin_time, rd)
+
+        # print path_sb
+        # print len(path_r)
+        # print len(path_sb)
+        fun1 = None
+        fun3 = None
+        if len(path_sb) > 0:
+            fun1 = fsolve.potential_path_to_fsolve(tools.re_translate_one_potential_path(path_sb), begin_time, rd)
+        # print path_r
+        # print tools.re_translate_one_potential_path(path_r)
+        # print begin_time
         fun2 = fsolve.potential_path_to_fsolve(tools.re_translate_one_potential_path(path_r), begin_time, rd)
-        fun3 = fsolve.potential_path_to_fsolve(tools.re_translate_one_potential_path(path_sa), begin_time, rd)
+        if len(path_sa) > 0:
+            fun3 = fsolve.potential_path_to_fsolve(tools.re_translate_one_potential_path(path_sa), begin_time, rd)
+
         for i in range(init_time, delta_time, delta_t):  #对于每一个分块的时间间隔 时间离散化操作
-            prob1 = dblquad.fun_2d(fun1, fun2, fun3, i, delta_time)  # 求解积分
-            print '输出一个概率:',
-            print prob1
+
+            if fun1 and fun3:
+                prob1 = dblquad.fun_2d(fun1, fun2, fun3, i, delta_time)  # 求解积分
+            elif fun1:
+
+                prob1 = dblquad.fun_1d_1(fun1, fun2, i, delta_time)
+
+            elif fun3:
+
+                prob1 = dblquad.fun_1d_2(fun2, fun3, i, delta_time)
+            else:
+
+                prob1 = dblquad.fun_1d_3(fun2, delta_time)
+
             prob_of_one_list_of_one_time_split = prob1[0]/s_pdf_function_list[each_path_contains_link[0]](delta_time) * prob_of_s[each_path_contains_link[0]]       #计算 P(trs|T)
+            # print '输出一个概率:',
+            # print prob1
+            # print prob_of_one_list_of_one_time_split  # prob1
             prob_list_of_one_link.append(prob_of_one_list_of_one_time_split)  #计算 P(trs|T)
         prob_list_all.append(prob_list_of_one_link)
 
@@ -108,7 +134,8 @@ def generate_best_query_point_time(most_likely_road_link, potential_path_set, s_
             currentProb = currentProb + each_time_prob[eachT]
         prob_of_all_time_split.append(currentProb)
 
-
+    print 'Final result :',
+    print prob_of_all_time_split
     best_query_prob = max(prob_of_all_time_split)
     best_query_time_index = prob_of_all_time_split.index(best_query_prob)
     best_query_time = init_time + best_query_time_index * delta_t
@@ -161,6 +188,8 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
 
     for i in range(len(road_link_prob)):
     #返回的是 具有最大的概率的查询点,包括被查询路段  查询时间  查询路段的序列等  还包括s的概率
+        print 'Best_query_prob:',
+        print road_link_prob[i]
         print 'Generateing best query time...'
         best_query_time = generate_best_query_point_time(road_link_prob[i],potential_path_set,s_pdf_function_list, begin_time, end_time, probility_list_with_time_interval)
         print 'Best_query_result:',

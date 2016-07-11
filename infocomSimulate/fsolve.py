@@ -88,6 +88,7 @@ def lognorm_together(list2):
 
 import tools
 def potential_path_to_fsolve(each_s, query_date, rd):
+
     ifweekend = tools.getDay(query_date)  # 需要查询的日期是否为周末
     current_s_para = []
     for i in range(len(each_s) - 1):  # 总共应该是有这么多的路径数量  这里有时候会有数据取不到  要处理数据娶不到的情况

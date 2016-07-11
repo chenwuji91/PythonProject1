@@ -20,7 +20,7 @@ def initCarFiles():
     global carFiles
     global carNames
 
-    #rd.initRoadData()
+    rd.initRoadData()
     car_path_files = rd.getCarDataList()
     # [详细信息[（fro,to,距离）,（fro,to,距离）...]，该段区间平均速度，开始时间，结束时间，unknown，导航距离，直线距离]
     print("start init car files...")
