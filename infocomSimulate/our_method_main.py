@@ -18,7 +18,7 @@ def generate_potential_path_set(begin_time, end_time, begin_road_intersection, e
     #                  ('256', '4425', '513', '214'), ('256','4275','6593','214'), ('256','4275','5933','214')]
     import roadDFS
     print '开始搜索潜在路径'
-    potential_set = roadDFS.searchAllRoad('1000', '947', 80)
+    potential_set = roadDFS.searchAllRoad(begin_road_intersection, end_road_intersection , 300)
     return potential_set
 
 def generate_s_pdf_function_list(potential_path, query_date):   # potential_path 接收的是点的保存信息
@@ -88,6 +88,7 @@ def generate_best_query_point_time(most_likely_road_link, potential_path_set, s_
         path_sb = potential_path_set[each_path_contains_link[0]][0:each_path_contains_link[1]]
         path_r = potential_path_set[each_path_contains_link[0]][each_path_contains_link[1]]
         path_sa = potential_path_set[each_path_contains_link[0]][each_path_contains_link[1]+1:len(potential_path_set[each_path_contains_link[0]])]
+        print path_sb
         fun1 = fsolve.potential_path_to_fsolve(tools.re_translate_one_potential_path(path_sb), begin_time, rd)
         fun2 = fsolve.potential_path_to_fsolve(tools.re_translate_one_potential_path(path_r), begin_time, rd)
         fun3 = fsolve.potential_path_to_fsolve(tools.re_translate_one_potential_path(path_sa), begin_time, rd)
@@ -146,8 +147,9 @@ def ask_taxi_if_exist(road_intersection1, road_intersection2, query_time):
 #主要流程控制及调用
 def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersection):
     print 'Searching potential path...'
-    potential_path_set = generate_potential_path_set(begin_time, end_time, begin_road_intersection, end_road_intersection)   #List(('12','32'),('12','45'),('22','63'))
-    potential_path_set = [('1007', '1009', '1122', '1186', '792', '814'),('1007', '1009', '1122', '1186', '792', '814','994')]
+    # potential_path_set = generate_potential_path_set(begin_time, end_time, begin_road_intersection, end_road_intersection)   #List(('12','32'),('12','45'),('22','63'))
+    # print potential_path_set
+    potential_path_set = [('406', '463', '1303', '451', '1402', '1345', '1330', '1389', '1330', '1345', '1330', '1326'), ('406', '463', '128', '268', '451', '1402', '1264', '1402', '1264', '1402', '1264', '1344', '1264', '1330', '1326'), ('406', '463', '128', '172', '128', '268', '451', '99', '250', '1329', '1326'), ('406', '463', '25', '1137', '1303', '1284', '1402', '1264', '1330', '1345', '1330', '1326'), ('406', '463', '1303', '451', '268', '451', '1402', '1264', '1330', '1389', '1310', '1389', '1330', '1326'), ('406', '463', '1303', '451', '1402', '451', '1402', '1264', '1330', '1345', '1330', '1389', '1330', '1326'), ('406', '463', '128', '268', '451', '268', '451', '268', '451', '1402', '1284', '1382', '1264', '1330', '1326'), ('406', '463', '128', '172', '99', '451', '1402', '1264', '1330', '1326'), ('406', '463', '1303', '451', '99', '1345', '99', '1345', '1329', '250', '1329', '1326'), ('406', '463', '1303', '1284', '1402', '451', '1402', '1264', '1402', '451', '99', '1345', '1330', '1326'), ('406', '463', '1303', '1284', '1303', '451', '1402', '1264', '1402', '1345', '99', '250', '1329', '1326'), ('406', '463', '1303', '1284', '1402', '1345', '1330', '1389', '1310', '1389', '1282', '1333', '1396', '1326'), ('406', '463', '1303', '1284', '1382', '1384', '1382', '1384', '1336', '1268', '1388', '1268', '1344', '1264', '1330', '1326'), ('406', '463', '1303', '451', '268', '451', '268', '451', '268', '451', '1402', '1264', '1402', '1345', '1329', '1326'), ('406', '463', '1303', '1284', '1303', '1284', '1402', '1345', '99', '250', '1329', '1326'), ('406', '463', '1303', '1284', '1402', '1264', '1382', '1264', '1330', '1345', '1330', '1345', '1329', '1326'), ('406', '463', '128', '268', '451', '268', '451', '1303', '1284', '1402', '1345', '1330', '1345', '1330', '1326')]
     print 'Generating pdf...'
     # 生成S={s1,s2...sn}的pdf函数  需要传入当前可能的路径集合以及需要生成的时间段  这个时间是这个时段的起始时刻就好了
     s_pdf_function_list = generate_s_pdf_function_list(potential_path_set, begin_time)
@@ -176,11 +178,11 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
 
 
 if __name__ == '__main__':
-    main_flow('2012-03-05 07:18:18','2012-03-05 07:19:18','1000','947')
-    potential_path_set = [('1007', '1009', '1122', '1186', '792', '814'),
-                          ('1007', '1009', '1122', '1186', '792', '814', '994')]
-    print tools.translate_potential_path(potential_path_set)
-    print tools.re_translate_potential_path(tools.translate_potential_path(potential_path_set))
+    main_flow('2012-03-05 07:01:42','2012-03-05 07:08:18','406','1326')
+    # potential_path_set = [('1007', '1009', '1122', '1186', '792', '814'),
+    #                       ('1007', '1009', '1122', '1186', '792', '814', '994')]
+    # print tools.translate_potential_path(potential_path_set)
+    # print tools.re_translate_potential_path(tools.translate_potential_path(potential_path_set))
 
 
 

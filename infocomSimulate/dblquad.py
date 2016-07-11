@@ -43,7 +43,7 @@ def fun_2d(fun1, fun2, fun3, t, T):
         # return fun1(a1) * stats.lognorm.pdf(a2, 1,fun2[0], fun2[1]) * fun3(T - a1 -a2)
         return fun1(a1) * fun2(a2) * fun3(T - a1 - a2)
 
-    return integrate.dblquad(f, 0, t, lambda ax:t - ax, lambda ax: T-ax, epsabs=1.49e-03, epsrel=1.49e-03)
+    return integrate.dblquad(f, 0, t, lambda ax:t - ax, lambda ax: T-ax, epsabs=1.49e-05, epsrel=1.49e-05)
 
 
 if __name__ == '__main__':

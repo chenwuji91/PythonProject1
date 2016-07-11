@@ -132,8 +132,8 @@ initCarFiles()  # 读入所有车辆信息
 print("init car files done.")
 #getCarRoutes()  # 生成所有车辆路径信息，并写入文本
 #print("all task done")
-# if True:    # test demo
-if False:  # test demo
+if True:    # test demo
+# if False:  # test demo
     while(True):
         s = raw_input("please input: time,from,to;format like:2012-03-07 07:18:09,1027,887\n")
         s = s.split(',')

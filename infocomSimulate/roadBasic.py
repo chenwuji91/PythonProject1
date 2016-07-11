@@ -232,7 +232,7 @@ def getCarDataList():
 
 import pickle
 def getCarObj(path):
-    dataFile = file(path)
+    dataFile = file(path,'rb')
     obj = pickle.load(dataFile)
     return obj
 
