@@ -14,11 +14,18 @@ def half_sphere(x, y):
 def half_circle(x):
     return (1-x**2)**0.5
 
-
+import math
 #注意 这个norm到后面换成新的那个整体的概率密度函数  现在暂时用标准正态分布函数做一个代替  到时候具体的函数可以作为一个参数传入这里
 def fun_2d(fun1, fun2, fun3, t, T):
 
+    # import matplotlib.pyplot as plt
+    # x = np.linspace(-100, 200)
+    # plt.plot(x, stats.lognorm.pdf(x, 1,fun2[0], fun2[1]), 'r-', alpha=0.6, label='norm pdf')
+    # plt.show()
 
+    # print 'Notice warning!!'
+    # print stats.lognorm.pdf(2.91179910784, 1,fun2[0], fun2[1])
+    # pass
 
     def f(a1, a2):
         # print a1
@@ -28,8 +35,13 @@ def fun_2d(fun1, fun2, fun3, t, T):
         # print fun4(a),
         # print 'lambda:',
         # print t - a1
+        # print fun1(a1)
+        # print a2
+        # print stats.lognorm.pdf(a2, 1,fun2[0], fun2[1])
+        # print fun3(T - a1 -a2)
 
-        return fun1(a1) * fun2[0](a2, 1,fun2[1], fun2[2]) * fun3(T - a1 -a2)
+        # return fun1(a1) * stats.lognorm.pdf(a2, 1,fun2[0], fun2[1]) * fun3(T - a1 -a2)
+        return fun1(a1) * fun2(a2) * fun3(T - a1 - a2)
 
     return integrate.dblquad(f, 0, t, lambda ax:t - ax, lambda ax: T-ax, epsabs=1.49e-03, epsrel=1.49e-03)
 
