@@ -130,7 +130,7 @@ def getCarRoutes():
 
 initCarFiles()  # 读入所有车辆信息
 print("init car files done.")
-#getCarRoutes()  # 生成所有车辆路径信息，并写入文本
+getCarRoutes()  # 生成所有车辆路径信息，并写入文本
 #print("all task done")
 if True:    # test demo
 # if False:  # test demo

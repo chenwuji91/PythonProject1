@@ -102,6 +102,8 @@ def generate_best_query_point_time(most_likely_road_link, potential_path_set, s_
         # print begin_time
         fun2 = fsolve.potential_path_to_fsolve(tools.re_translate_one_potential_path(path_r), begin_time, rd)
         if len(path_sa) > 0:
+            # print '!!'
+            # print tools.re_translate_one_potential_path(path_sa)
             fun3 = fsolve.potential_path_to_fsolve(tools.re_translate_one_potential_path(path_sa), begin_time, rd)
 
         for i in range(init_time, delta_time, delta_t):  #对于每一个分块的时间间隔 时间离散化操作
@@ -147,6 +149,8 @@ def generate_best_query_point_time(most_likely_road_link, potential_path_set, s_
 #询问出租车车辆是不是在这个地方   输入一辆车在的路口以及需要查询的时间
 #需要调用出租车位置的相关接口  然后返回true or false 判断车辆是不是在那里
 def ask_taxi_if_exist(road_intersection1, road_intersection2, query_time):
+    # return True
+
     import pick_from_route
     import getcarinfo
     import random
@@ -174,9 +178,9 @@ def ask_taxi_if_exist(road_intersection1, road_intersection2, query_time):
 #主要流程控制及调用
 def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersection):
     print 'Searching potential path...'
-    # potential_path_set = generate_potential_path_set(begin_time, end_time, begin_road_intersection, end_road_intersection)   #List(('12','32'),('12','45'),('22','63'))
-    # print potential_path_set
-    potential_path_set = [('406', '463', '1303', '451', '1402', '1345', '1330', '1389', '1330', '1345', '1330', '1326'), ('406', '463', '128', '268', '451', '1402', '1264', '1402', '1264', '1402', '1264', '1344', '1264', '1330', '1326'), ('406', '463', '128', '172', '128', '268', '451', '99', '250', '1329', '1326'), ('406', '463', '25', '1137', '1303', '1284', '1402', '1264', '1330', '1345', '1330', '1326'), ('406', '463', '1303', '451', '268', '451', '1402', '1264', '1330', '1389', '1310', '1389', '1330', '1326'), ('406', '463', '1303', '451', '1402', '451', '1402', '1264', '1330', '1345', '1330', '1389', '1330', '1326'), ('406', '463', '128', '268', '451', '268', '451', '268', '451', '1402', '1284', '1382', '1264', '1330', '1326'), ('406', '463', '128', '172', '99', '451', '1402', '1264', '1330', '1326'), ('406', '463', '1303', '451', '99', '1345', '99', '1345', '1329', '250', '1329', '1326'), ('406', '463', '1303', '1284', '1402', '451', '1402', '1264', '1402', '451', '99', '1345', '1330', '1326'), ('406', '463', '1303', '1284', '1303', '451', '1402', '1264', '1402', '1345', '99', '250', '1329', '1326'), ('406', '463', '1303', '1284', '1402', '1345', '1330', '1389', '1310', '1389', '1282', '1333', '1396', '1326'), ('406', '463', '1303', '1284', '1382', '1384', '1382', '1384', '1336', '1268', '1388', '1268', '1344', '1264', '1330', '1326'), ('406', '463', '1303', '451', '268', '451', '268', '451', '268', '451', '1402', '1264', '1402', '1345', '1329', '1326'), ('406', '463', '1303', '1284', '1303', '1284', '1402', '1345', '99', '250', '1329', '1326'), ('406', '463', '1303', '1284', '1402', '1264', '1382', '1264', '1330', '1345', '1330', '1345', '1329', '1326'), ('406', '463', '128', '268', '451', '268', '451', '1303', '1284', '1402', '1345', '1330', '1345', '1330', '1326')]
+    potential_path_set = generate_potential_path_set(begin_time, end_time, begin_road_intersection, end_road_intersection)   #List(('12','32'),('12','45'),('22','63'))
+    print potential_path_set
+    # potential_path_set = [('406', '463', '1303', '451', '1402', '1345', '1330', '1389', '1330', '1345', '1330', '1326'), ('406', '463', '128', '268', '451', '1402', '1264', '1402', '1264', '1402', '1264', '1344', '1264', '1330', '1326'), ('406', '463', '128', '172', '128', '268', '451', '99', '250', '1329', '1326'), ('406', '463', '25', '1137', '1303', '1284', '1402', '1264', '1330', '1345', '1330', '1326'), ('406', '463', '1303', '451', '268', '451', '1402', '1264', '1330', '1389', '1310', '1389', '1330', '1326'), ('406', '463', '1303', '451', '1402', '451', '1402', '1264', '1330', '1345', '1330', '1389', '1330', '1326'), ('406', '463', '128', '268', '451', '268', '451', '268', '451', '1402', '1284', '1382', '1264', '1330', '1326'), ('406', '463', '128', '172', '99', '451', '1402', '1264', '1330', '1326'), ('406', '463', '1303', '451', '99', '1345', '99', '1345', '1329', '250', '1329', '1326'), ('406', '463', '1303', '1284', '1402', '451', '1402', '1264', '1402', '451', '99', '1345', '1330', '1326'), ('406', '463', '1303', '1284', '1303', '451', '1402', '1264', '1402', '1345', '99', '250', '1329', '1326'), ('406', '463', '1303', '1284', '1402', '1345', '1330', '1389', '1310', '1389', '1282', '1333', '1396', '1326'), ('406', '463', '1303', '1284', '1382', '1384', '1382', '1384', '1336', '1268', '1388', '1268', '1344', '1264', '1330', '1326'), ('406', '463', '1303', '451', '268', '451', '268', '451', '268', '451', '1402', '1264', '1402', '1345', '1329', '1326'), ('406', '463', '1303', '1284', '1303', '1284', '1402', '1345', '99', '250', '1329', '1326'), ('406', '463', '1303', '1284', '1402', '1264', '1382', '1264', '1330', '1345', '1330', '1345', '1329', '1326'), ('406', '463', '128', '268', '451', '268', '451', '1303', '1284', '1402', '1345', '1330', '1345', '1330', '1326')]
     print 'Generating pdf...'
     # 生成S={s1,s2...sn}的pdf函数  需要传入当前可能的路径集合以及需要生成的时间段  这个时间是这个时段的起始时刻就好了
     s_pdf_function_list = generate_s_pdf_function_list(potential_path_set, begin_time)
@@ -195,10 +199,11 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
         print 'Best_query_result:',
         print best_query_time
         query_time = best_query_time   #在什么时间查这一段路获得的概率最大
-        ask_result = ask_taxi_if_exist(road_link_prob[i],query_time)   #each_link_prob可以是一个元组 保存了多个信息
+        ask_result = ask_taxi_if_exist(road_link_prob[i][0][0],road_link_prob[i][0][1],tools.increase_several_seconds(begin_time,query_time))   #each_link_prob可以是一个元组 保存了多个信息
         if ask_result == True:
             print 'Query recursive...'
-            return main_flow() + main_flow()  #分割的两个段  继续调用这个函数
+            return main_flow(begin_time, int(tools.increase_several_seconds(begin_time,best_query_time[0])*0.9), begin_road_intersection,road_link_prob[i][0][0]) \
+                   + main_flow(int(tools.increase_several_seconds(begin_time,best_query_time[0]*0.9)), end_time, road_link_prob[i][0][1],begin_road_intersection) #分割的两个段  继续调用这个函数
     print 'Returning current query result...'
     return potential_path_set[potential_path_set.index(max(probility_list_with_time_interval))]  #如果循环做完  这一段没得查 就直接返回概率最大的路段
 
@@ -207,7 +212,7 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
 
 
 if __name__ == '__main__':
-    main_flow('2012-03-05 07:01:42','2012-03-05 07:08:18','406','1326')
+    print main_flow('2012-03-05 07:01:42','2012-03-05 07:05:18','406','1402')
     # potential_path_set = [('1007', '1009', '1122', '1186', '792', '814'),
     #                       ('1007', '1009', '1122', '1186', '792', '814', '994')]
     # print tools.translate_potential_path(potential_path_set)

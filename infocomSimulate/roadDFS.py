@@ -12,7 +12,7 @@ rd.initRoadData()
 MAX_VELOCITY = 20
 
 # 允许的搜索深度
-level = 30
+level = 20
 
 # 一条路径
 route = []

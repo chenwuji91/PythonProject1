@@ -32,8 +32,8 @@ def int2str(n):
     return int2str0(hour) + ':' + int2str0(minute) + ':' + int2str0(second)
 
 def getinfo(time, filename):
-    #rd.initRoadData()
-    with open(filename, 'r') as f:
+    rd.initRoadData()
+    with open('car_route'+ os.path.sep + filename, 'r') as f:
         all_text_list = f.read().lstrip('[').rstrip(']').split('},\n{')
         all_text_list[0] = all_text_list[0].lstrip('{')
         all_text_list[len(all_text_list)-1] = all_text_list[len(all_text_list)-1].rstrip('}')

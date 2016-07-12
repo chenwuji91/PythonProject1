@@ -93,7 +93,19 @@ def re_translate_one_potential_path(potential_list):#将边的表示转换成为
     translated_set.append(eachS[1])
     return translated_set
 
+from datetime import datetime
+from datetime import timedelta
+def increase_several_seconds(ds, increase_seconds):
+    incre = timedelta(seconds = increase_seconds)
+    ds2 = datetime.strptime(ds, "%Y-%m-%d %H:%M:%S") + incre
+    return str(ds2)
+
+def decrease_several_seconds(ds, increase_seconds):
+    incre = timedelta(seconds = increase_seconds)
+    ds2 = datetime.strptime(ds, "%Y-%m-%d %H:%M:%S") - incre
+    return str(ds2)
 
 if __name__ == '__main__':
-    print timeRetranslate(73)
-    print re_translate_one_potential_path([('1007', '1009'), ('1009', '1122')])
+    print increase_several_seconds('2015-02-03 12:21:21', 100)
+    # print timeRetranslate(73)
+    # print re_translate_one_potential_path([('1007', '1009'), ('1009', '1122')])
