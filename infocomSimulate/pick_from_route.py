@@ -33,8 +33,8 @@ def int2str(n):
 
 def getinfo(time, filename):
     rd.initRoadData()
-    with open('car_route'+ os.path.sep + filename, 'r') as f:
-        all_text_list = f.read().lstrip('[').rstrip(']').split('},\n{')
+    with open('data' + os.path.sep + filename, 'r') as f:
+        all_text_list = f.read().lstrip('[').rstrip(']').split('},\r\n{')
         all_text_list[0] = all_text_list[0].lstrip('{')
         all_text_list[len(all_text_list)-1] = all_text_list[len(all_text_list)-1].rstrip('}')
         pre_time = all_text_list[0].split(', ')[2].split(': ')[1].strip('"')
@@ -56,8 +56,9 @@ def getinfo(time, filename):
             pre_from = to
         return None  # 没有查询到合适的记录，查询失败
 
-while True:  # TEST
-    s = raw_input("please input file name and check time\n")
-    s = s.split(',')
-    print getinfo(s[1], s[0])
+if "__main__" == __name__:
+    while True:  # TEST
+        s = raw_input("please input file name and check time\n")
+        s = s.split(',')
+        print getinfo(s[1], s[0])
 # 20120321_3565.txt_868f0f00-433c-11e6-90db-3497f625b127,2012-03-22 07:05:10
