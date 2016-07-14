@@ -175,7 +175,7 @@ def judgeBounds(roadIntersection):
 
 #判断路口是否含有摄像头 True含有， False没有
 def judgeCamera(roadIntersection):
-    return cameraList.__contains__(roadIntersection)
+    return roadIntersection in cameraList
 
 def getRoadLen(roadIntersection1, roadIntersection2):#返回float类型
     neighbour = roadAdjDict.get(roadIntersection1)
@@ -227,7 +227,7 @@ def getCarDataList():
 
 import pickle
 def getCarObj(path):
-    dataFile = file(path,'rb')
+    dataFile = file(path,'r')
     obj = pickle.load(dataFile)
     return obj
 
@@ -235,6 +235,7 @@ def getCarObj(path):
 def readCamera():
     f = open('data' + sep + 'camera.txt')
     for eachline in f:
+        eachline = eachline.split('\n')[0].split('\r')[0]
         cameraList.append(eachline)
     f.close()
 

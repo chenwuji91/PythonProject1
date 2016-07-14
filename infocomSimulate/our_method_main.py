@@ -3,15 +3,20 @@
 @author: chenwuji
 实验主类   控制整个实验流程 调用相关的方法得到相关的结果
 '''
+# import roadBasic as rd
+# rd.initRoadData()
+# rd.initTimeData()
+import tools
+import pick_from_route
+
+import random
+import roadDFS
+import math
+import getcarinfo
+
 import roadBasic as rd
 rd.initRoadData()
 rd.initTimeData()
-import tools
-import pick_from_route
-# import getcarinfo
-import random
-
-
 
 #产生道路的所有候选路段的集合
 def generate_potential_path_set(begin_time, end_time, begin_road_intersection, end_road_intersection):
@@ -19,9 +24,10 @@ def generate_potential_path_set(begin_time, end_time, begin_road_intersection, e
     # potential_set = [('256','425','593','214'), ('256','4235','5923','214'), ('256','4235','5493','214'),
     #                  ('256', '4225', '5793', '214'), ('256','4525','5393','214'), ('256','4625','5963','2714'),
     #                  ('256', '4425', '513', '214'), ('256','4275','6593','214'), ('256','4275','5933','214')]
-    import roadDFS
+
     # print '开始搜索潜在路径'
-    potential_set = roadDFS.searchAllRoad(begin_road_intersection, end_road_intersection , 300)
+
+    potential_set = roadDFS.searchAllRoad(begin_road_intersection, end_road_intersection , tools.intervalofSeconds(begin_time, end_time),rd)
     return potential_set
 
 def generate_s_pdf_function_list(potential_path, query_date):   # potential_path 接收的是点的保存信息
@@ -121,8 +127,8 @@ def generate_best_query_point_time(most_likely_road_link, potential_path_set, s_
 
                 prob1 = dblquad.fun_1d_2(fun2, fun3, i, delta_time)
             else:
-
-                prob1 = dblquad.fun_1d_3(fun2, delta_time)
+                prob1 = (fun2(i),0)
+                # prob1 = dblquad.fun_1d_3(fun2, delta_time)
 
             prob_of_one_list_of_one_time_split = prob1[0]/s_pdf_function_list[each_path_contains_link[0]](delta_time) * prob_of_s[each_path_contains_link[0]]       #计算 P(trs|T)
             # print '输出一个概率:',
@@ -149,28 +155,30 @@ def generate_best_query_point_time(most_likely_road_link, potential_path_set, s_
 
 
 
-#询问出租车车辆是不是在这个地方   输入一辆车在的路口以及需要查询的时间
-#需要调用出租车位置的相关接口  然后返回true or false 判断车辆是不是在那里
-# def ask_taxi_if_exist(road_intersection1, road_intersection2, query_time):
-#     # return True
-#
-#     # import pick_from_route
-#     # import getcarinfo
-#     # import random
-#     taxi_car_location_list = getcarinfo.getCarInfo(query_time.split('\r')[0].split('\n')[0],road_intersection1,road_intersection2)
-#     real_car_position = pick_from_route.getinfo(query_time.split('\r')[0].split('\n')[0]+'\n', '1')  #待检测的车辆的位置
-#     if real_car_position[0] != road_intersection1 or real_car_position[1]!= road_intersection2:
-#         print 'Query Fail...'
-#         return False
-#     for each_taxi in taxi_car_location_list:
-#         taxi_position = each_taxi[3]
-#         real_car_position = real_car_position[2]
-#         if real_car_position - taxi_position < 150:
-#             if random.uniform(0,100) < 80.0:
-#                 print 'Query Successfully!'
-#                 return True
-#     print 'Query Fail...'
-#     return False
+# 询问出租车车辆是不是在这个地方   输入一辆车在的路口以及需要查询的时间
+# 需要调用出租车位置的相关接口  然后返回true or false 判断车辆是不是在那里
+def ask_taxi_if_exist(road_intersection1, road_intersection2, query_time):
+    # return True
+
+    # import pick_from_route
+    # import getcarinfo
+    # import random
+    getcarinfo.initCarFiles(rd)
+    taxi_car_location_list = getcarinfo.getCarInfo(query_time.split('\r')[0].split('\n')[0],road_intersection1,road_intersection2)
+    real_car_position = pick_from_route.getinfo(query_time.split('\r')[0].split('\n')[0]+'\n', '1')  #待检测的车辆的位置
+    if real_car_position[0] != road_intersection1 or real_car_position[1]!= road_intersection2:
+        print 'Query Fail...'
+        return False
+    for each_taxi in taxi_car_location_list:
+        taxi_position = each_taxi[3]
+        real_car_position = real_car_position[2]
+        print taxi_car_location_list
+        if abs(real_car_position - taxi_position) < 300:
+            if random.uniform(0,100) < 80.0:
+                print 'Query Successfully!'
+                return True
+    print 'Query Fail...'
+    return False
 
 
 def ask_taxi(road_intersection1, road_intersection2, query_time):
@@ -214,17 +222,21 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
         print best_query_time
         query_time = best_query_time   #在什么时间查这一段路获得的概率最大
         # ask_result = ask_taxi_if_exist(road_link_prob[i][0][0],road_link_prob[i][0][1],tools.increase_several_seconds(begin_time,query_time[0]))   #each_link_prob可以是一个元组 保存了多个信息
-        ask_result = ask_taxi(road_link_prob[i][0][0],road_link_prob[i][0][1],tools.increase_several_seconds(begin_time,query_time[0]))   #each_link_prob可以是一个元组 保存了多个信息
+        ask_result = ask_taxi_if_exist(road_link_prob[i][0][0],road_link_prob[i][0][1],tools.increase_several_seconds(begin_time,query_time[0]))   #each_link_prob可以是一个元组 保存了多个信息
         if ask_result == True:
             print 'Query recursive...'
             print 'From:'+str(begin_road_intersection)+',To:'+str(road_link_prob[i][0][0])
             print 'From:'+str(road_link_prob[i][0][1]) + ',To:' + str(end_road_intersection)
             if begin_road_intersection != str(road_link_prob[i][0][0]):
-                result1 = main_flow(begin_time, tools.increase_several_seconds(begin_time,int(best_query_time[0])), begin_road_intersection,road_link_prob[i][0][0])
+                time1_1 = rd.getRoadTimeAvg(road_link_prob[i][0][0],road_link_prob[i][0][1],
+                                            tools.timeTranslate(begin_time),tools.getDay(begin_time))
+                result1 = main_flow(begin_time, tools.increase_several_seconds(begin_time,int(best_query_time[0] + 0.5 * math.pow(math.e,time1_1))), begin_road_intersection,road_link_prob[i][0][0])
             else:
                 result1 = [begin_road_intersection]
             if str(end_road_intersection) != str(road_link_prob[i][0][1]):
-                result2 = main_flow(tools.increase_several_seconds(begin_time,int(best_query_time[0])), end_time, road_link_prob[i][0][1],end_road_intersection)
+                time1_1 = rd.getRoadTimeAvg(road_link_prob[i][0][0],road_link_prob[i][0][1],
+                                            tools.timeTranslate(begin_time), tools.getDay(begin_time))
+                result2 = main_flow(tools.increase_several_seconds(begin_time,int(best_query_time[0]+ 0.5 * math.pow(math.e, time1_1))), end_time, road_link_prob[i][0][1],end_road_intersection)
             else:
                 result2 = [end_road_intersection]
             return  result1 + result2
@@ -237,7 +249,7 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
 
 
 if __name__ == '__main__':
-    print main_flow('2012-03-12 16:41:12','2012-03-12 16:45:00','1335','1378')
+    print main_flow('2012-03-19 09:14:01','2012-03-19 09:18:22','1335','1246')
     # potential_path_set = [('1007', '1009', '1122', '1186', '792', '814'),
     #                       ('1007', '1009', '1122', '1186', '792', '814', '994')]
     # print tools.translate_potential_path(potential_path_set)

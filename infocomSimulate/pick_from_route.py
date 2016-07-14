@@ -10,6 +10,7 @@
 返回 （from， to，离from的距离d）三个参数
 """
 import os
+import re
 import roadBasic as rd
 import tools
 
@@ -33,8 +34,9 @@ def int2str(n):
 
 def getinfo(time, filename):
     rd.initRoadData()
-    with open('data' + os.path.sep + filename, 'r') as f:
-        all_text_list = f.read().lstrip('[').rstrip(']').split('},\r\n{')
+    with open('data' + os.path.sep+filename, 'r') as f:
+        all_text_list = f.read().lstrip('[').strip('\r\n').strip('\n').rstrip(']')
+        all_text_list = re.split(r'},\n{|},\r\n{', all_text_list)
         all_text_list[0] = all_text_list[0].lstrip('{')
         all_text_list[len(all_text_list)-1] = all_text_list[len(all_text_list)-1].rstrip('}')
         pre_time = all_text_list[0].split(', ')[2].split(': ')[1].strip('"')

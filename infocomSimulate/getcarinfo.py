@@ -5,22 +5,26 @@
 date，from, to =>[taxi1, taxi2, taxi3,...],taxi=(id,x,y,距离from)
 """
 import os
-import roadBasic as rd
+# import roadBasic as rd
 import tools
+rd = None
 
 carFiles = {}   # 所有出租车读入的详细信息
 carNames = []   # 所有出租车的名字，即ID
 
-def initCarFiles():
+
+def initCarFiles(rd1):
     """
     读入全部车辆基础数据
     :return: 写入全局变量 carFiles中
     """
-
+    if rd != None:
+        return
+    global rd
     global carFiles
     global carNames
-
-    rd.initRoadData()
+    rd = rd1
+    # rd.initRoadData()
     car_path_files = rd.getCarDataList()
     # [详细信息[（fro,to,距离）,（fro,to,距离）...]，该段区间平均速度，开始时间，结束时间，unknown，导航距离，直线距离]
     print("start init car files...")
@@ -128,7 +132,7 @@ def getCarRoutes():
             except:
                 print("error:%s" % str(r[i]))
 
-initCarFiles()  # 读入所有车辆信息
+  # 读入所有车辆信息
 # getCarRoutes()  # 生成所有车辆路径信息，并写入文本
 # print("all task done")
 
