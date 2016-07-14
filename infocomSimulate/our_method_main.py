@@ -8,15 +8,17 @@
 # rd.initTimeData()
 import tools
 import pick_from_route
-
+import glob
 import random
 import roadDFS
 import math
 import getcarinfo
-
+import os
 import roadBasic as rd
+import evaluateRoute
 rd.initRoadData()
 rd.initTimeData()
+count_query = 0
 
 #产生道路的所有候选路段的集合
 def generate_potential_path_set(begin_time, end_time, begin_road_intersection, end_road_intersection):
@@ -157,34 +159,41 @@ def generate_best_query_point_time(most_likely_road_link, potential_path_set, s_
 
 # 询问出租车车辆是不是在这个地方   输入一辆车在的路口以及需要查询的时间
 # 需要调用出租车位置的相关接口  然后返回true or false 判断车辆是不是在那里
-def ask_taxi_if_exist(road_intersection1, road_intersection2, query_time):
+def ask_taxi_if_exist(road_intersection1, road_intersection2, query_time, queryFile):
     # return True
 
     # import pick_from_route
     # import getcarinfo
     # import random
+    global count_query
     getcarinfo.initCarFiles(rd)
     taxi_car_location_list = getcarinfo.getCarInfo(query_time.split('\r')[0].split('\n')[0],road_intersection1,road_intersection2)
-    real_car_position = pick_from_route.getinfo(query_time.split('\r')[0].split('\n')[0]+'\n', '1')  #待检测的车辆的位置
+    real_car_position = pick_from_route.getinfo(query_time.split('\r')[0].split('\n')[0]+'\n', queryFile, rd)  #待检测的车辆的位置
     if real_car_position[0] != road_intersection1 or real_car_position[1]!= road_intersection2:
         print 'Query Fail...'
         return False
     for each_taxi in taxi_car_location_list:
         taxi_position = each_taxi[3]
-        real_car_position = real_car_position[2]
+        real_car_position1 = real_car_position[2]
         print taxi_car_location_list
-        if abs(real_car_position - taxi_position) < 300:
+        if abs(real_car_position1 - taxi_position) < 300:
+            count_query = count_query + 1
             if random.uniform(0,100) < 80.0:
+                count_query = count_query + 1
                 print 'Query Successfully!'
                 return True
     print 'Query Fail...'
     return False
 
 
-def ask_taxi(road_intersection1, road_intersection2, query_time):
+def ask_taxi(road_intersection1, road_intersection2, query_time, queryFile):
 
-    real_car_position = pick_from_route.getinfo(query_time.split('\r')[0].split('\n')[0] + '\n', '1')  # 待检测的车辆的位置
+    real_car_position = pick_from_route.getinfo(query_time.split('\r')[0].split('\n')[0] + '\n', queryFile, rd)  # 待检测的车辆的位置
     if real_car_position[0] == road_intersection1 and real_car_position[1] == road_intersection2:
+        print road_intersection1
+        print road_intersection2
+        print query_time
+        print real_car_position
         print 'Query Success...'
         return True
     else:
@@ -196,7 +205,7 @@ def ask_taxi(road_intersection1, road_intersection2, query_time):
 
 
 #主要流程控制及调用
-def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersection):
+def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersection, queryFile):
     print 'Searching potential path...'
     potential_path_set = generate_potential_path_set(begin_time, end_time, begin_road_intersection, end_road_intersection)   #List(('12','32'),('12','45'),('22','63'))
     print potential_path_set
@@ -222,7 +231,7 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
         print best_query_time
         query_time = best_query_time   #在什么时间查这一段路获得的概率最大
         # ask_result = ask_taxi_if_exist(road_link_prob[i][0][0],road_link_prob[i][0][1],tools.increase_several_seconds(begin_time,query_time[0]))   #each_link_prob可以是一个元组 保存了多个信息
-        ask_result = ask_taxi_if_exist(road_link_prob[i][0][0],road_link_prob[i][0][1],tools.increase_several_seconds(begin_time,query_time[0]))   #each_link_prob可以是一个元组 保存了多个信息
+        ask_result = ask_taxi_if_exist(road_link_prob[i][0][0],road_link_prob[i][0][1],tools.increase_several_seconds(begin_time,query_time[0]), queryFile)   #each_link_prob可以是一个元组 保存了多个信息
         if ask_result == True:
             print 'Query recursive...'
             print 'From:'+str(begin_road_intersection)+',To:'+str(road_link_prob[i][0][0])
@@ -230,13 +239,13 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
             if begin_road_intersection != str(road_link_prob[i][0][0]):
                 time1_1 = rd.getRoadTimeAvg(road_link_prob[i][0][0],road_link_prob[i][0][1],
                                             tools.timeTranslate(begin_time),tools.getDay(begin_time))
-                result1 = main_flow(begin_time, tools.increase_several_seconds(begin_time,int(best_query_time[0] + 0.5 * math.pow(math.e,time1_1))), begin_road_intersection,road_link_prob[i][0][0])
+                result1 = main_flow(begin_time, tools.increase_several_seconds(begin_time,int(best_query_time[0] + 0.5 * math.pow(math.e,time1_1))), begin_road_intersection,road_link_prob[i][0][0],queryFile)
             else:
                 result1 = [begin_road_intersection]
             if str(end_road_intersection) != str(road_link_prob[i][0][1]):
                 time1_1 = rd.getRoadTimeAvg(road_link_prob[i][0][0],road_link_prob[i][0][1],
                                             tools.timeTranslate(begin_time), tools.getDay(begin_time))
-                result2 = main_flow(tools.increase_several_seconds(begin_time,int(best_query_time[0]+ 0.5 * math.pow(math.e, time1_1))), end_time, road_link_prob[i][0][1],end_road_intersection)
+                result2 = main_flow(tools.increase_several_seconds(begin_time,int(best_query_time[0]+ 0.5 * math.pow(math.e, time1_1))), end_time, road_link_prob[i][0][1],end_road_intersection,queryFile)
             else:
                 result2 = [end_road_intersection]
             return  result1 + result2
@@ -249,11 +258,64 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
 
 
 if __name__ == '__main__':
-    print main_flow('2012-03-19 09:14:01','2012-03-19 09:18:22','1335','1246')
+    cam_list = []
+    f = open('data' + os.path.sep + 'camera.txt')
+    for eachline in f:
+        eachline = eachline.split('\n')[0].split('\r')[0]
+        cam_list.append(eachline)
+    f.close()
+
+    flist = glob.glob('data_for_run' + os.path.sep + '*')
+    all_path_list = []
+    for each_path in flist:
+        f = open(each_path)
+        onepath = []
+        for eachline in f:
+            if len(eachline.split(',')) > 2:
+                rd_intersection = eachline.split(',')[0].split('\"num\": \"')[1].split('\"')[0]
+                speed = int(eachline.split(',')[1].split('\"speed\": ')[1])
+                time = eachline.split(',')[2].split('\"time\": \"')[1].split('\"')[0]
+                if rd_intersection in cam_list and len(onepath) > 0:
+                    onepath.append((rd_intersection, speed, time, os.path.basename(each_path)))
+                    all_path_list.append(onepath)
+                    onepath = []
+                else:
+                    onepath.append((rd_intersection, speed, time, os.path.basename(each_path)))
+
+    for each_path in all_path_list:
+        if each_path[0][0] == each_path[len(each_path)-1][0]:
+            all_path_list.remove(each_path)
+
+    real_path = []
+    for each_path in all_path_list:
+        temp_p = []
+        for each_p in each_path:
+            temp_p.append(each_p[0])
+        real_path = real_path + temp_p
+
+    print real_path
+    print 'Now searching.. :',
+    print all_path_list
+
+    all_result_list = []
+    for each_carmera_path in all_path_list:
+        print 'setLevel:',
+        print len(each_carmera_path)
+        roadDFS.level = len(each_carmera_path)
+        roadDFS.firstCall = False
+        currentResult = main_flow(each_carmera_path[0][2],each_carmera_path[len(each_carmera_path)-1][2],
+                                  each_carmera_path[0][0], each_carmera_path[len(each_carmera_path) - 1][0],
+                                  each_carmera_path[0][3])
+        # print currentResult
+        # print '#$#######'
+        all_result_list = all_result_list + currentResult
+    # print main_flow('2012-03-19 09:14:01','2012-03-19 09:18:22','1335','1246','1')
     # potential_path_set = [('1007', '1009', '1122', '1186', '792', '814'),
     #                       ('1007', '1009', '1122', '1186', '792', '814', '994')]
     # print tools.translate_potential_path(potential_path_set)
     # print tools.re_translate_potential_path(tools.translate_potential_path(potential_path_set))
-
+    print all_result_list
+    print count_query
+    print evaluateRoute.evaluateFunc(real_path, all_result_list)
 
 

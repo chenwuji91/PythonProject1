@@ -53,6 +53,17 @@ def int2str(n):
     second = n % 60
     return int2str0(hour) + ':' + int2str0(minute) + ':' + int2str0(second)
 def getCarInfo(time, fro, to):
+    time = '2012-03-02' + time[10:19]
+    fro = fro.split('\r')[0].split('\n')[0]
+    to = to.split('\r')[0].split('\n')[0]
+    print '&&&&&&&&&',
+    print fro,
+    print ',',
+    print to,
+    print ',',
+    print time,
+    print ',',
+
     matched_car = []
     for car in carNames:
         for period in carFiles[car]:
@@ -80,6 +91,7 @@ def getCarInfo(time, fro, to):
                     d += dat[2]
                     index += 1
                 break   # 时间段匹配成功，但无需求数据，跳出，进行下一辆车查找
+    print matched_car
     return matched_car
 
 def car_route(carname):
@@ -137,7 +149,12 @@ def getCarRoutes():
 # print("all task done")
 
 if "__main__" == __name__:
+    import  roadBasic as rd1
+    rd1.initRoadData()
+
+    initCarFiles(rd1)
     while True:
+
         s = raw_input("please input: time,from,to;format like:2012-03-07 07:18:09,1027,887\n")
         s = s.split(',')
         print getCarInfo(s[0], s[1], s[2])

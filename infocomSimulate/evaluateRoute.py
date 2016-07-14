@@ -16,7 +16,7 @@ def transRoute(route) :
         temp = start.strip() + '-' + route[i].strip()
         result.append(temp)
         start = route[i][:]
-    print(result)
+    # print(result)
     return result
 
 #求一个序列去掉自己的子序列
@@ -65,8 +65,8 @@ def maxComSubseq(list1, list2) :
                     fMatrix[i + 1][j + 1].sequence = fMatrix[i][j + 1].sequence[:]
 
 
-    print fMatrix[len1][len2].maxLen
-    print fMatrix[len1][len2].sequence
+    # print fMatrix[len1][len2].maxLen
+    # print fMatrix[len1][len2].sequence
     return fMatrix[len1][len2].sequence
 
 
@@ -79,17 +79,17 @@ def evaluateFunc(realRoute, predictRoute) :
     lessList = removeCom(realList, commonList)          # FT
     moreList = removeCom(predictList, commonList)        # TF
 
-    print(lessList)
-    print(moreList)
-
-    print(float(len(commonList)) / float(len(moreList)))
+    # print(lessList)
+    # print(moreList)
+    #
+    # print(float(len(commonList)) / float(len(moreList)))
 
     return float(len(commonList)) / float(len(moreList))
 
 
-
-list1 = ['965', '1180', '979', '1210', '1119', '1012', '913', '1000', '1001', '983', '1058', '825', '800', '801', '802', '825', '803', '804', '802', '825', '1143', '947', '1136', '990']
-list2 = ['965', '1180', '52', '47', '979', '1210', '1119', '1012', '913', '983', '1058', '825','803', '804', '802', '825', '800', '801', '802', '825', '1143', '947', '1136', '947', '1136', '990']
-evaluateFunc(list1, list2)
+#
+# list1 = ['965', '1180', '979', '1210', '1119', '1012', '913', '1000', '1001', '983', '1058', '825', '800', '801', '802', '825', '803', '804', '802', '825', '1143', '947', '1136', '990']
+# list2 = ['965', '1180', '52', '47', '979', '1210', '1119', '1012', '913', '983', '1058', '825','803', '804', '802', '825', '800', '801', '802', '825', '1143', '947', '1136', '947', '1136', '990']
+# evaluateFunc(list1, list2)
 
 

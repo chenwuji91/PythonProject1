@@ -33,6 +33,7 @@ def intervalofSeconds(d1, d2):
     return (dd2-dd1).seconds
 
 
+
 #计算类
 from math import radians, cos, sin, asin, sqrt
 def calculate(lon1, lat1, lon2, lat2): # 经度1，纬度1，经度2，纬度2 （十进制度数）
@@ -106,6 +107,8 @@ def decrease_several_seconds(ds, increase_seconds):
     return str(ds2)
 
 if __name__ == '__main__':
-    print increase_several_seconds('2015-02-03 12:21:21', 100)
+    print increase_several_seconds('2015-03-07 16:10:10', 24)
+    ttt = '2015-02-03 12:21:21'
+    print ttt[10:19]
     # print timeRetranslate(73)
     # print re_translate_one_potential_path([('1007', '1009'), ('1009', '1122')])

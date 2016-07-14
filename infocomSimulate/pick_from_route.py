@@ -11,7 +11,7 @@
 """
 import os
 import re
-import roadBasic as rd
+# import roadBasic as rd
 import tools
 
 def int2str0(n):
@@ -32,9 +32,8 @@ def int2str(n):
     second = n % 60
     return int2str0(hour) + ':' + int2str0(minute) + ':' + int2str0(second)
 
-def getinfo(time, filename):
-    rd.initRoadData()
-    with open('data' + os.path.sep+filename, 'r') as f:
+def getinfo(time, filename, rd):
+    with open('data_for_run' + os.path.sep+filename, 'r') as f:
         all_text_list = f.read().lstrip('[').strip('\r\n').strip('\n').rstrip(']')
         all_text_list = re.split(r'},\n{|},\r\n{', all_text_list)
         all_text_list[0] = all_text_list[0].lstrip('{')
@@ -52,6 +51,8 @@ def getinfo(time, filename):
                 pre_t = str2int(pre_time)
                 dt = float(now_t - pre_t)  # 整个该路段的时间间隔
                 percent = (str2int(time) - pre_t) / dt  # 根据时间所占的比例，计算出距离
+                print pre_from
+                print to
                 d = rd.getRoadLen(pre_from, to) * percent
                 return pre_from, to, d
             pre_time = now_time

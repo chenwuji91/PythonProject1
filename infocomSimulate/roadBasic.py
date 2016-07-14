@@ -7,7 +7,7 @@
 
 import tools
 import os
-
+import copy
 zuoshangjiao = 120.6354828592534, 31.376368052001823
 zuoxiajiao = 120.63549057996597, 31.253756666173818
 youshangjiao = 120.85634919819948, 31.376015656647887
@@ -15,7 +15,7 @@ youxiajiao = 120.85635657413037, 31.253404335545934
 sep = os.path.sep
 cameraList = []
 lukouDict = {}
-roadAdjDict = {}
+__roadAdjDict = {}
 carDataDict = []
 weekend_speed_avg_varivace_para = {}
 weekday_speed_avg_varivace_para = {}
@@ -178,12 +178,23 @@ def judgeCamera(roadIntersection):
     return roadIntersection in cameraList
 
 def getRoadLen(roadIntersection1, roadIntersection2):#返回float类型
-    neighbour = roadAdjDict.get(roadIntersection1)
+    roadIntersection1 = roadIntersection1.split('\r')[0].split('\n')[0]
+    roadIntersection2 = roadIntersection2.split('\r')[0].split('\n')[0]
+    # print roadIntersection1
+    # print roadIntersection2
+    # print __roadAdjDict.get(roadIntersection1)
+    # print __roadAdjDict.get(roadIntersection2)
+    # print __roadAdjDict.get(str(1284))
+    # print __roadAdjDict.get(str(1284))
+    neighbour = __roadAdjDict.get(str(roadIntersection1))
+    # print roadIntersection2 in neighbour
+
     if roadIntersection2 in neighbour:
-        dis = tools.calculate(lukouDict.get(roadIntersection1).x, lukouDict.get(roadIntersection1).y,
-                          lukouDict.get(roadIntersection2).x, lukouDict.get(roadIntersection2).y)
+        dis = tools.calculate(lukouDict.get(str(roadIntersection1)).x, lukouDict.get(str(roadIntersection1)).y,
+                          lukouDict.get(str(roadIntersection2)).x, lukouDict.get(str(roadIntersection2)).y)
     else:
         print 'Illegal parameter! Check the adj relation!'
+        # print 0/0
         dis = -1
     return dis
 
@@ -193,7 +204,8 @@ def getRoadPointLocation(roadIntersection1):#返回tuple类型 ((),())嵌套形�
     return position1
 
 def getNeighbourList(roadIntersection1):
-    return roadAdjDict.get(roadIntersection1)
+
+    return copy.copy(__roadAdjDict.get(roadIntersection1))
 
 
 class RoadIntersectionPoint:
@@ -217,7 +229,7 @@ def readAdj():
         for eachline in f:
             list1 = eachline.split(':')
             list2 = list1[1].split()
-            roadAdjDict.setdefault(list1[0],list2)
+            __roadAdjDict.setdefault(list1[0],list2)
         f.close()
 
 import glob
@@ -241,9 +253,13 @@ def readCamera():
 
 
 def initRoadData():
+
     readAdj()
     readLukou()
     readCamera()
+    # print '!!!!!:',
+    # print __roadAdjDict.get('1284')
+
 
 
 def initSpeedData():
@@ -270,3 +286,10 @@ def readAvg_variance(path, dict_weekend, dict_weekday):
             dict_weekend.setdefault(timeInterval, dict_avg_one_time)
         else:
             dict_weekday.setdefault(timeInterval, dict_avg_one_time)
+
+
+if __name__ == '__main__':
+    initRoadData()
+    print getRoadLen('263','393')
+    print getRoadLen('263','393')/18*3.6
+
