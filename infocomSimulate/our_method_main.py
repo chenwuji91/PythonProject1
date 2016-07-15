@@ -147,8 +147,8 @@ def generate_best_query_point_time(most_likely_road_link, potential_path_set, s_
             currentProb = currentProb + each_time_prob[eachT]
         prob_of_all_time_split.append(currentProb)
 
-    print 'Final result :',
-    print prob_of_all_time_split
+    # print 'Final result :',
+    # print prob_of_all_time_split
     best_query_prob = max(prob_of_all_time_split)
     best_query_time_index = prob_of_all_time_split.index(best_query_prob)
     best_query_time = init_time + best_query_time_index * delta_t
@@ -175,14 +175,14 @@ def ask_taxi_if_exist(road_intersection1, road_intersection2, query_time, queryF
     for each_taxi in taxi_car_location_list:
         taxi_position = each_taxi[3]
         real_car_position1 = real_car_position[2]
-        print taxi_car_location_list
+        # print taxi_car_location_list
         if abs(real_car_position1 - taxi_position) < 300:
             count_query = count_query + 1
-            if random.uniform(0,100) < 80.0:
-                count_query = count_query + 1
-                print 'Query Successfully!'
-                return True
-    print 'Query Fail...'
+            # if random.uniform(0,100) < 80.0:
+            count_query = count_query + 1
+            print 'Query Successfully!'
+            return True
+    print 'Query Fail......'
     return False
 
 
@@ -190,14 +190,14 @@ def ask_taxi(road_intersection1, road_intersection2, query_time, queryFile):
 
     real_car_position = pick_from_route.getinfo(query_time.split('\r')[0].split('\n')[0] + '\n', queryFile, rd)  # 待检测的车辆的位置
     if real_car_position[0] == road_intersection1 and real_car_position[1] == road_intersection2:
-        print road_intersection1
-        print road_intersection2
-        print query_time
-        print real_car_position
-        print 'Query Success...'
+        # print road_intersection1
+        # print road_intersection2
+        # print query_time
+        # print real_car_position
+        # print 'Query Success...'
         return True
     else:
-        print 'Query Fail...'
+        # print 'Query Fail...'
         return False
 
 
@@ -225,7 +225,7 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
     #返回的是 具有最大的概率的查询点,包括被查询路段  查询时间  查询路段的序列等  还包括s的概率
         print 'Best_query_prob:',
         print road_link_prob[i]
-        # print 'Generateing best query time...'
+        print 'Generateing best query time...'
         best_query_time = generate_best_query_point_time(road_link_prob[i],potential_path_set,s_pdf_function_list, begin_time, end_time, probility_list_with_time_interval)
         print 'Best_query_time:',
         print best_query_time
@@ -234,8 +234,8 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
         ask_result = ask_taxi_if_exist(road_link_prob[i][0][0],road_link_prob[i][0][1],tools.increase_several_seconds(begin_time,query_time[0]), queryFile)   #each_link_prob可以是一个元组 保存了多个信息
         if ask_result == True:
             print 'Query recursive...'
-            print 'From:'+str(begin_road_intersection)+',To:'+str(road_link_prob[i][0][0])
-            print 'From:'+str(road_link_prob[i][0][1]) + ',To:' + str(end_road_intersection)
+            # print 'From:'+str(begin_road_intersection)+',To:'+str(road_link_prob[i][0][0])
+            # print 'From:'+str(road_link_prob[i][0][1]) + ',To:' + str(end_road_intersection)
             if begin_road_intersection != str(road_link_prob[i][0][0]):
                 time1_1 = rd.getRoadTimeAvg(road_link_prob[i][0][0],road_link_prob[i][0][1],
                                             tools.timeTranslate(begin_time),tools.getDay(begin_time))
@@ -254,10 +254,7 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
   #如果循环做完  这一段没得查 就直接返回概率最大的路段
 
 
-
-
-
-if __name__ == '__main__':
+def do_main_by_loop(path_name):
     cam_list = []
     f = open('data' + os.path.sep + 'camera.txt')
     for eachline in f:
@@ -265,25 +262,25 @@ if __name__ == '__main__':
         cam_list.append(eachline)
     f.close()
 
-    flist = glob.glob('data_for_run' + os.path.sep + '*')
+
     all_path_list = []
-    for each_path in flist:
-        f = open(each_path)
-        onepath = []
-        for eachline in f:
-            if len(eachline.split(',')) > 2:
-                rd_intersection = eachline.split(',')[0].split('\"num\": \"')[1].split('\"')[0]
-                speed = int(eachline.split(',')[1].split('\"speed\": ')[1])
-                time = eachline.split(',')[2].split('\"time\": \"')[1].split('\"')[0]
-                if rd_intersection in cam_list and len(onepath) > 0:
-                    onepath.append((rd_intersection, speed, time, os.path.basename(each_path)))
-                    all_path_list.append(onepath)
-                    onepath = []
-                else:
-                    onepath.append((rd_intersection, speed, time, os.path.basename(each_path)))
+
+    f = open(path_name)
+    onepath = []
+    for eachline in f:
+        if len(eachline.split(',')) > 2:
+            rd_intersection = eachline.split(',')[0].split('\"num\": \"')[1].split('\"')[0]
+            speed = int(eachline.split(',')[1].split('\"speed\": ')[1])
+            time = eachline.split(',')[2].split('\"time\": \"')[1].split('\"')[0]
+            if rd_intersection in cam_list and len(onepath) > 0:
+                onepath.append((rd_intersection, speed, time, os.path.basename(path_name)))
+                all_path_list.append(onepath)
+                onepath = []
+            else:
+                onepath.append((rd_intersection, speed, time, os.path.basename(path_name)))
 
     for each_path in all_path_list:
-        if each_path[0][0] == each_path[len(each_path)-1][0]:
+        if each_path[0][0] == each_path[len(each_path) - 1][0]:
             all_path_list.remove(each_path)
 
     real_path = []
@@ -299,11 +296,14 @@ if __name__ == '__main__':
 
     all_result_list = []
     for each_carmera_path in all_path_list:
+        print 'BEGIN A NEW LIST,THE LIST IS :',
+        print each_carmera_path
         print 'setLevel:',
         print len(each_carmera_path)
+        rd.readCamera()
         roadDFS.level = len(each_carmera_path)
         roadDFS.firstCall = False
-        currentResult = main_flow(each_carmera_path[0][2],each_carmera_path[len(each_carmera_path)-1][2],
+        currentResult = main_flow(each_carmera_path[0][2], each_carmera_path[len(each_carmera_path) - 1][2],
                                   each_carmera_path[0][0], each_carmera_path[len(each_carmera_path) - 1][0],
                                   each_carmera_path[0][3])
         # print currentResult
@@ -317,5 +317,16 @@ if __name__ == '__main__':
     print all_result_list
     print count_query
     print evaluateRoute.evaluateFunc(real_path, all_result_list)
+    tools.writeToFile('data_result',str(os.path.basename(path_name)) + ',real path:' +
+                      str(real_path) + ',predict path:' + str(all_result_list) +
+                      ',query times:' + str(count_query) + ',final score:' + str(evaluateRoute.evaluateFunc(real_path, all_result_list)))
+
+
+
+if __name__ == '__main__':
+    flist = glob.glob('data_for_run' + os.path.sep + '*')
+    for each_path in flist:
+        print 'BEGIN A NEW FILE  @WJCHEN'
+        do_main_by_loop(each_path)
 
 

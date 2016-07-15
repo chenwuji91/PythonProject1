@@ -245,6 +245,8 @@ def getCarObj(path):
 
 #读入含有摄像头的路口
 def readCamera():
+    global cameraList
+    cameraList = []
     f = open('data' + sep + 'camera.txt')
     for eachline in f:
         eachline = eachline.split('\n')[0].split('\r')[0]

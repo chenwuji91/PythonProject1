@@ -9,10 +9,10 @@
 #rd.initRoadData()
 
 #路网的最高限速m/s
-MAX_VELOCITY = 100
+MAX_VELOCITY = 30
 
 # 允许的搜索深度
-level = 6
+level = 5
 
 rd = None
 
@@ -120,7 +120,7 @@ if __name__ == '__main__':
     import roadBasic as rd
 
     rd.initRoadData()
-    print searchAllRoad('128', '1402', 123, rd)
+    print searchAllRoad('1329', '1303', 135, rd)
     print rd.judgeBounds('128')
     print rd.judgeBounds('1402')
     # print searchAllRoad('1335', '1237', 260, rd)

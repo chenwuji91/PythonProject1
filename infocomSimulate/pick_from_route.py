@@ -51,8 +51,8 @@ def getinfo(time, filename, rd):
                 pre_t = str2int(pre_time)
                 dt = float(now_t - pre_t)  # 整个该路段的时间间隔
                 percent = (str2int(time) - pre_t) / dt  # 根据时间所占的比例，计算出距离
-                print pre_from
-                print to
+                # print pre_from
+                # print to
                 d = rd.getRoadLen(pre_from, to) * percent
                 return pre_from, to, d
             pre_time = now_time

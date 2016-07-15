@@ -56,13 +56,13 @@ def getCarInfo(time, fro, to):
     time = '2012-03-02' + time[10:19]
     fro = fro.split('\r')[0].split('\n')[0]
     to = to.split('\r')[0].split('\n')[0]
-    print '&&&&&&&&&',
-    print fro,
-    print ',',
-    print to,
-    print ',',
-    print time,
-    print ',',
+    # print '&&&&&&&&&',
+    # print fro,
+    # print ',',
+    # print to,
+    # print ',',
+    # print time,
+    # print ',',
 
     matched_car = []
     for car in carNames:
@@ -91,7 +91,8 @@ def getCarInfo(time, fro, to):
                     d += dat[2]
                     index += 1
                 break   # 时间段匹配成功，但无需求数据，跳出，进行下一辆车查找
-    print matched_car
+    # print 'Successfully asked the car and return:',
+    # print matched_car
     return matched_car
 
 def car_route(carname):
