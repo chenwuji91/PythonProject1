@@ -33,6 +33,7 @@ def removeCom(list, sublist) :
             i += 1
     while i < len(list) :
         result.append(list[i])
+        i = i + 1
 
     return result
 
@@ -83,7 +84,8 @@ def evaluateFunc(realRoute, predictRoute) :
     # print(moreList)
     #
     # print(float(len(commonList)) / float(len(moreList)))
-
+    if len(moreList) == 0:
+        return float(len(commonList)) / (float(len(moreList))+ 0.0000001)
     return float(len(commonList)) / float(len(moreList))
 
 

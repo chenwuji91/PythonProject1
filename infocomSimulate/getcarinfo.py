@@ -111,7 +111,7 @@ def car_route(carname):
             if left <= 1:   # 长度为1，则扔掉
                 break
             left -= 1
-            d += period[0][0][2]
+            d += dat[2]
             if rd.judgeBounds(dat[1]):
                 #dat[1] != pre_to and
                 percent = d / period[5]

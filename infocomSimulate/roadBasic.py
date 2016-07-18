@@ -54,7 +54,7 @@ def getRoadSpeedVariance(roadIntersection1, roadIntersection2,time1, ifweekend):
 
 #time1时刻是否有路段roadIntersection1--roadIntersection2信息
 def f1(roadIntersection1, roadIntersection2, time1, ifweekend):
-    if (time1 < 70 or time1 > 200):
+    if (int(time1) < 70 or int(time1) > 200):
         return False
     if ifweekend == 1:
         allLukou = weekend_time_avg_varivace_para.get(str(time1))
@@ -91,7 +91,7 @@ def getRoadTimeAvg(roadIntersection1, roadIntersection2, time1, ifweekend):
     t = time1
     r1 = roadIntersection1
     r2 = roadIntersection2
-    while f1(roadIntersection1, roadIntersection2, time1, ifweekend) == False:
+    while f1(roadIntersection1, roadIntersection2, time1, ifweekend) == False and time1 >=70 and time1 <= 200:
         #相邻时间的此路段
         if f1(roadIntersection1, roadIntersection2, time1 + 1, ifweekend):
             flag = True
@@ -142,7 +142,7 @@ def getRoadTimeVariance(roadIntersection1, roadIntersection2, time1, ifweekend):
     t = time1
     r1 = roadIntersection1
     r2 = roadIntersection2
-    while f1(roadIntersection1, roadIntersection2, time1, ifweekend) == False:
+    while f1(roadIntersection1, roadIntersection2, time1, ifweekend) == False and time1 >=70 and time1 <= 200:
         # 相邻时间的此路段
         if f1(roadIntersection1, roadIntersection2, time1 + 1, ifweekend):
             flag = True
@@ -194,7 +194,9 @@ def getRoadLen(roadIntersection1, roadIntersection2):#返回float类型
                           lukouDict.get(str(roadIntersection2)).x, lukouDict.get(str(roadIntersection2)).y)
     else:
         print 'Illegal parameter! Check the adj relation!'
-        # print 0/0
+        print roadIntersection1
+        print roadIntersection2
+        print 0/0
         dis = -1
     return dis
 
@@ -225,12 +227,12 @@ def readLukou():
         f.close()
 
 def readAdj():
-        f =open('data'+sep+'roadnet_newid')
-        for eachline in f:
-            list1 = eachline.split(':')
-            list2 = list1[1].split()
-            __roadAdjDict.setdefault(list1[0],list2)
-        f.close()
+    f =open('data'+sep+'roadnet_newid')
+    for eachline in f:
+        list1 = eachline.split(':')
+        list2 = list1[1].split()
+        __roadAdjDict.setdefault(list1[0],list2)
+    f.close()
 
 import glob
 def getCarDataList():
@@ -247,7 +249,7 @@ def getCarObj(path):
 def readCamera():
     global cameraList
     cameraList = []
-    f = open('data' + sep + 'camera.txt')
+    f = open('data' + sep + 'camera.txt.tempremove')
     for eachline in f:
         eachline = eachline.split('\n')[0].split('\r')[0]
         cameraList.append(eachline)

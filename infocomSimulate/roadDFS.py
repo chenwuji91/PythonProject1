@@ -12,7 +12,7 @@
 MAX_VELOCITY = 30
 
 # 允许的搜索深度
-level = 5
+level = 8
 
 rd = None
 
@@ -45,26 +45,30 @@ def minRunTime(roadIntersection, adjionList) :
 
 #路径遍历函数
 def rDFS(roadIntersection1, roadIntersection2, Time, level,route, routeList) :
+    route.append(roadIntersection1)
 
     if (Time < 0 or level < 0):  #T耗完，或者搜索深度耗完
-        return
-    if (roadIntersection1 == roadIntersection2):
-        # 找到了一条路径
-        tempRoute = route[:]
-        tempRoute.append(roadIntersection1)
-        # print '路径搜索状态:'
-        # print(tempRoute)
-        routeList.append(tuple(tempRoute))
+        route.pop()
         return
 
-    route.append(roadIntersection1)
 
     # 递归遍历相邻路口
     adjionList = adjionInter(roadIntersection1)
     times = minRunTime(roadIntersection1, adjionList)
     for roadInter in adjionList:
-        if route.count(roadInter)<=2:
+        if (roadInter == roadIntersection2):
+            # 找到了一条路径
+            tempRoute = route[:]
+            tempRoute.append(roadInter)
+            # print '路径搜索状态:'
+            # print(tempRoute)
+            routeList.append(tuple(tempRoute))
+            #route.pop()
+            #return
+        elif route.count(roadInter)<=2:
+            #tempRoute = route[:]
             rDFS(roadInter, roadIntersection2, Time - times[adjionList.index(roadInter)], level - 1,route, routeList)
+            #route.pop()
     route.pop()
 
 def search_exist_list(roadIntersection1, roadIntersection2):
@@ -120,7 +124,7 @@ if __name__ == '__main__':
     import roadBasic as rd
 
     rd.initRoadData()
-    print searchAllRoad('1329', '1303', 135, rd)
+    print searchAllRoad('406', '1239', 300, rd)
     print rd.judgeBounds('128')
     print rd.judgeBounds('1402')
     # print searchAllRoad('1335', '1237', 260, rd)

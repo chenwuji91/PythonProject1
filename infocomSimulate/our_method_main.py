@@ -256,7 +256,7 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
 
 def do_main_by_loop(path_name):
     cam_list = []
-    f = open('data' + os.path.sep + 'camera.txt')
+    f = open('data' + os.path.sep + 'camera.txt.tempremove')
     for eachline in f:
         eachline = eachline.split('\n')[0].split('\r')[0]
         cam_list.append(eachline)
@@ -279,9 +279,7 @@ def do_main_by_loop(path_name):
             else:
                 onepath.append((rd_intersection, speed, time, os.path.basename(path_name)))
 
-    for each_path in all_path_list:
-        if each_path[0][0] == each_path[len(each_path) - 1][0]:
-            all_path_list.remove(each_path)
+
 
     real_path = []
     for each_path in all_path_list:
@@ -301,13 +299,12 @@ def do_main_by_loop(path_name):
         print 'setLevel:',
         print len(each_carmera_path)
         rd.readCamera()
-        roadDFS.level = len(each_carmera_path)
+        roadDFS.level = len(each_carmera_path) - 1
         roadDFS.firstCall = False
         currentResult = main_flow(each_carmera_path[0][2], each_carmera_path[len(each_carmera_path) - 1][2],
                                   each_carmera_path[0][0], each_carmera_path[len(each_carmera_path) - 1][0],
                                   each_carmera_path[0][3])
-        # print currentResult
-        # print '#$#######'
+
         all_result_list = all_result_list + currentResult
     # print main_flow('2012-03-19 09:14:01','2012-03-19 09:18:22','1335','1246','1')
     # potential_path_set = [('1007', '1009', '1122', '1186', '792', '814'),
@@ -326,7 +323,12 @@ def do_main_by_loop(path_name):
 if __name__ == '__main__':
     flist = glob.glob('data_for_run' + os.path.sep + '*')
     for each_path in flist:
-        print 'BEGIN A NEW FILE  @WJCHEN'
-        do_main_by_loop(each_path)
+        try:
+            print 'BEGIN A NEW FILE  @WJCHEN'
+            do_main_by_loop(each_path)
+        except:
+            tools.writeToFile('data_result', str(each_path))
+
+
 
 

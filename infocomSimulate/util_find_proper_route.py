@@ -24,7 +24,7 @@ def proper_road_intersection_set():
     f.close()
 
 def read_carema():
-    f = open('data' + os.path.sep + 'camera.txt')
+    f = open('data' + os.path.sep + 'camera.txt.tempremove')
     for eachline in f:
         camera_intersection.add(eachline.split('\r')[0].split('\n')[0])
     f.close()

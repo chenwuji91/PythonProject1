@@ -6,7 +6,6 @@ fsolve解决对数正态叠加的问题
 import math
 from scipy import stats
 from scipy.optimize import fsolve
-import matplotlib.pyplot as plt
 import numpy as np
 current_para0_12 = 0.0
 current_para3 = 0.0
