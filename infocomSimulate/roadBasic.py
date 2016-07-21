@@ -249,7 +249,7 @@ def getCarObj(path):
 def readCamera():
     global cameraList
     cameraList = []
-    f = open('data' + sep + 'camera.txt.tempremove')
+    f = open('data' + sep + 'camera.txt')
     for eachline in f:
         eachline = eachline.split('\n')[0].split('\r')[0]
         cameraList.append(eachline)

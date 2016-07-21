@@ -79,7 +79,7 @@ def evaluateFunc(realRoute, predictRoute) :
     commonList = maxComSubseq(realList, predictList)    # TT
     lessList = removeCom(realList, commonList)          # FT
     moreList = removeCom(predictList, commonList)        # TF
-
+    return len(commonList),len(lessList),len(moreList)
     # print(lessList)
     # print(moreList)
     #

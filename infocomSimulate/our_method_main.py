@@ -231,7 +231,7 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
         print best_query_time
         query_time = best_query_time   #在什么时间查这一段路获得的概率最大
         # ask_result = ask_taxi_if_exist(road_link_prob[i][0][0],road_link_prob[i][0][1],tools.increase_several_seconds(begin_time,query_time[0]))   #each_link_prob可以是一个元组 保存了多个信息
-        ask_result = ask_taxi_if_exist(road_link_prob[i][0][0],road_link_prob[i][0][1],tools.increase_several_seconds(begin_time,query_time[0]), queryFile)   #each_link_prob可以是一个元组 保存了多个信息
+        ask_result = ask_taxi_if_exist(road_link_prob[i][0][0],road_link_prob[i][0][1],tools.increase_several_seconds(begin_time,int(query_time[0])), queryFile)   #each_link_prob可以是一个元组 保存了多个信息
         if ask_result == True:
             print 'Query recursive...'
             # print 'From:'+str(begin_road_intersection)+',To:'+str(road_link_prob[i][0][0])
@@ -256,7 +256,7 @@ def main_flow(begin_time, end_time, begin_road_intersection, end_road_intersecti
 
 def do_main_by_loop(path_name):
     cam_list = []
-    f = open('data' + os.path.sep + 'camera.txt.tempremove')
+    f = open('data' + os.path.sep + 'camera.txt')
     for eachline in f:
         eachline = eachline.split('\n')[0].split('\r')[0]
         cam_list.append(eachline)
@@ -323,11 +323,11 @@ def do_main_by_loop(path_name):
 if __name__ == '__main__':
     flist = glob.glob('data_for_run' + os.path.sep + '*')
     for each_path in flist:
-        try:
+        # try:
             print 'BEGIN A NEW FILE  @WJCHEN'
             do_main_by_loop(each_path)
-        except:
-            tools.writeToFile('data_result', str(each_path))
+        # except:
+        #     tools.writeToFile('data_result', str(each_path))
 
 
 

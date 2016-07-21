@@ -153,8 +153,8 @@ def do_main_by_loop(path_name):
 if __name__ == '__main__':
     flist = glob.glob('data_for_run' + os.path.sep + '*')
     for each_path in flist:
-        try:
+        # try:
             print 'BEGIN A NEW FILE  @WJCHEN'
             do_main_by_loop(each_path)
-        except:
-            tools.writeToFile('data_result', str(each_path))
+        # except:
+        #     tools.writeToFile('data_result', str(each_path))

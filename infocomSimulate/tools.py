@@ -13,6 +13,12 @@ def timeTranslate(date):
     timeSplit = int((h * 60 + m)/6) + 1
     return timeSplit
 
+def timeTranslate_half_hour(date):
+    h = datetime.strptime(date, "%Y-%m-%d %H:%M:%S").hour
+    m = datetime.strptime(date, "%Y-%m-%d %H:%M:%S").minute
+    timeSplit = int((h * 60 + m)/30) + 1
+    return timeSplit
+
 def timeRetranslate(time):
     time = int(time)
     hour = int(time/10)
@@ -110,5 +116,7 @@ if __name__ == '__main__':
     print increase_several_seconds('2015-03-07 16:10:10', 24)
     ttt = '2015-02-03 12:21:21'
     print ttt[10:19]
+    print timeRetranslate(84)
+    print intervalofSeconds('2015-03-07 6:10:10','2015-03-07 06:12:10')
     # print timeRetranslate(73)
     # print re_translate_one_potential_path([('1007', '1009'), ('1009', '1122')])
